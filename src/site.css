@@ -1,0 +1,138 @@
+@media (max-width: 860px) {
+  .home-divisions {
+    grid-template-columns: 1fr !important;
+    max-width: 480px !important;
+  }
+}
+.home-division:hover img {
+  transform: scale(1.04);
+}
+.home-division:hover h3 {
+  color: var(--magenta-bright);
+}
+@keyframes vx-marquee {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.vx-marquee {
+  animation: vx-marquee 40s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vx-marquee {
+    animation: none;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* VEXA in-page jump nav — the page is long enough to need a scan-fast affordance */
+.vx-jumpnav {
+  position: sticky;
+  top: var(--navbar-height, 66px);
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  justify-content: center;
+  padding: 0 var(--page-margin);
+  background: var(--black);
+}
+.vx-jumpnav-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 2px;
+  font-family: var(--font-label);
+  font-size: var(--text-label-sm);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-meta);
+  transition: color var(--duration-fast) var(--ease-standard);
+}
+.vx-jumpnav-link:hover {
+  color: var(--magenta);
+}
+.vx-jumpnav-link-active {
+  color: var(--magenta);
+}
+@media (max-width: 640px) {
+  .vx-jumpnav {
+    gap: var(--space-4);
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+}
+
+/* Nav links overflow the viewport on narrow phones — let them scroll
+   horizontally instead of wrapping/clipping. */
+@media (max-width: 700px) {
+  .site-nav {
+    gap: var(--space-3);
+  }
+  .site-nav-links {
+    gap: var(--space-4) !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .site-nav-links::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Scroll-scrubbed era rail (VEXA) — numeral + block light up as the reader reaches them */
+.vx-era-active {
+  opacity: 1 !important;
+}
+span.vx-era-active {
+  color: var(--magenta) !important;
+  border-color: var(--magenta) !important;
+}
+
+/* Subtle scan-assist hover on list-shaped content (service rows, era items,
+   mission points) — a border/tint shift, not a click affordance. */
+.vx-hover-row {
+  transition-property: border-color, background-color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-standard);
+}
+.vx-hover-row:hover {
+  border-color: var(--magenta);
+  background: rgba(219, 0, 159, 0.05);
+}
+
+/* Large-type list items (VEXA effect) get a text color shift instead of
+   relying on the border/tint alone — that treatment reads as a leftover
+   default at display-type scale. */
+.vx-effect-row {
+  color: var(--text-primary);
+  transition-property: color, border-color, background-color;
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-standard);
+}
+.vx-effect-row:hover {
+  color: var(--magenta);
+}
+
+/* Row-shaped layouts collapse to a stacked card under the point where four/three
+   inline columns of text get too narrow to read (~640px). */
+@media (max-width: 640px) {
+  .vx-service-row,
+  .ca-method-row,
+  .ca-talk-row {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-2) !important;
+  }
+  .am-split {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-4) !important;
+  }
+}

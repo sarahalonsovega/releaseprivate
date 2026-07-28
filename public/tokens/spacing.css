@@ -1,0 +1,19 @@
+:root{
+/* Spacing — editorial margins, generous negative space */
+--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:64px;--space-9:116px;--space-10:144px;
+--page-margin:clamp(24px,5vw,80px);
+--section-gap:var(--space-10);
+/* Borders & radii — fine 1px rules, slight consistent rounding. Nothing exceeds 6px
+   except circular avatar crops. Pill geometry never appears. */
+--border-hairline:1px solid var(--rule);
+--border-accent:1px solid var(--magenta);
+--radius-none:0px;
+--radius-tag:2px;      /* tags */
+--radius-control:3px;  /* buttons & inputs */
+--radius-card:4px;     /* cards & media */
+--radius-overlay:6px;  /* menus & overlays — the maximum */
+--radius-avatar:50%;   /* circular avatar crop — only exception */
+/* Shadows — none in the core language. Glow is the only elevation. */
+--glow-signal:0 0 48px rgba(219,0,159,0.45);
+--glow-signal-soft:0 0 96px rgba(219,0,159,0.25);
+}
