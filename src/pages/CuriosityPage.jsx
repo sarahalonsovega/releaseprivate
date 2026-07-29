@@ -1,5 +1,4 @@
 import { Label } from "../components/core/Label.jsx";
-import { Rule } from "../components/core/Rule.jsx";
 import { Button } from "../components/core/Button.jsx";
 import { QuoteBlock } from "../components/core/QuoteBlock.jsx";
 import { NotifyForm } from "../components/NotifyForm.jsx";
@@ -15,9 +14,9 @@ export function CuriosityPage() {
     ["It's the safer bet.", "Most real advances are imports, a method from one field solving a problem in another. You can't see that from inside a single field. Three fields that talk to each other is a hedge, not a scatter."],
   ];
   const method = [
-    ["01", "Go deep in more than one place.", "Not dabbling. Deep enough in each field to produce real work you can point to."],
-    ["02", "Design the intersections.", "Scattered and cross-domain look the same from outside. Structure is the difference: shared language, transferable methods, deliberate overlap."],
-    ["03", "Make the connection the output.", "What you ship is the link itself, the pattern you can only see standing in two fields at once."],
+    ["01", "Go deep in more than one place.", "Not dabbling. Deep enough in each field to produce real work you can point to.", "/uploads/curiosity-architecture-hero.png", "Layered architectural curves, seen from below"],
+    ["02", "Design the intersections.", "Scattered and cross-domain look the same from outside. Structure is the difference: shared language, transferable methods, deliberate overlap.", "/uploads/curiosity_img-1785178969991.png", "Intersecting planes of magenta glass"],
+    ["03", "Make the connection the output.", "What you ship is the link itself, the pattern you can only see standing in two fields at once.", "/uploads/File 17.png", "Close-up portrait, focused gaze"],
   ];
 
   return (
@@ -39,9 +38,9 @@ export function CuriosityPage() {
 
       <section style={{ padding: "var(--space-9) var(--page-margin)" }}>
         <h2 style={{ ...caSerif, fontSize: "var(--text-display-md)", marginBottom: "clamp(32px,5vh,48px)" }}>Why breadth holds up</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-7)" }}>
-          {why.map(([t, d]) => (
-            <div key={t} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+        <div className="ca-why-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-7)" }}>
+          {why.map(([t, d], i) => (
+            <div key={t} className={i === 1 ? "ca-why-offset" : undefined} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <span aria-hidden="true" style={{ fontFamily: "var(--font-serif)", fontSize: "48px", lineHeight: 1, color: "var(--magenta)" }}>"</span>
               <h3 style={{ ...caSerif, fontSize: "var(--text-heading-lg)" }}>{t}</h3>
               <p style={{ ...caBody, fontSize: "var(--text-body)" }}>{d}</p>
@@ -53,14 +52,18 @@ export function CuriosityPage() {
       <section style={{ padding: "var(--space-9) var(--page-margin)" }}>
         <Label color="var(--magenta)">Methodology</Label>
         <div style={{ marginTop: "24px" }}>
-          {method.map(([n, t, d]) => (
-            <div key={n} className="ca-method-row vx-hover-row" style={{ display: "grid", gridTemplateColumns: "80px 1fr 2fr", gap: "var(--space-5)", alignItems: "baseline", padding: "28px 20px", margin: "0 -20px", borderTop: "1px solid var(--rule)" }}>
-              <span style={{ fontFamily: "var(--font-title)", fontWeight: 700, fontSize: "24px", color: "var(--magenta)" }}>{n}</span>
-              <h3 style={{ ...caSerif, fontSize: "var(--text-heading-lg)" }}>{t}</h3>
-              <p style={{ ...caBody }}>{d}</p>
+          {method.map(([n, t, d, img, alt]) => (
+            <div key={n} className="ca-method-block" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-7)", alignItems: "center", padding: "var(--space-8) 0", borderTop: "1px solid var(--rule)" }}>
+              <div style={{ textAlign: "left" }}>
+                <span style={{ fontFamily: "var(--font-title)", fontWeight: 700, fontSize: "var(--text-heading-sm)", color: "var(--magenta)" }}>{n}</span>
+                <h3 style={{ ...caSerif, fontSize: "var(--text-display-md)", margin: "12px 0 14px" }}>{t}</h3>
+                <p style={{ ...caBody, fontSize: "var(--text-body-lg)", maxWidth: "42ch" }}>{d}</p>
+              </div>
+              <div style={{ aspectRatio: "4/3", overflow: "hidden", borderRadius: "var(--radius-card)" }}>
+                <img src={img} alt={alt} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+              </div>
             </div>
           ))}
-          <Rule />
         </div>
       </section>
 
@@ -104,7 +107,7 @@ export function CuriosityPage() {
 
       <section style={{ padding: "var(--space-10) var(--page-margin)", textAlign: "center", backgroundImage: "linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.55)), url('/uploads/curiosity-intersection.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <h2 style={{ ...caSerif, fontSize: "var(--text-display-lg)" }}>Curiosity is a structure. Build at the <span style={caEmphasis}>intersection</span>.</h2>
-        <p style={{ margin: "24px auto 0", maxWidth: "52ch", color: "rgba(255,255,255,0.8)", lineHeight: "var(--body-line-height)" }}>Open to speaking, research collaborations, consulting, partnerships — or conversations that don't fit any of those.</p>
+        <p style={{ margin: "24px auto 0", maxWidth: "52ch", color: "rgba(255,255,255,0.8)", lineHeight: "var(--body-line-height)" }}>Open to speaking, research collaborations, consulting, and partnerships, or conversations that don't fit any of those.</p>
         <p style={{ marginTop: "24px" }}><a href="mailto:hello@cuelum.com" style={{ color: "var(--white)" }}>hello@cuelum.com</a></p>
       </section>
     </div>

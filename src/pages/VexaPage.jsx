@@ -5,6 +5,7 @@ import { Rule } from "../components/core/Rule.jsx";
 import { Button } from "../components/core/Button.jsx";
 import { TextField } from "../components/core/TextField.jsx";
 import { Stat } from "../components/core/Stat.jsx";
+import { DensityField } from "../components/core/DensityField.jsx";
 
 const vxSerif = { margin: 0, fontFamily: "var(--font-serif)", fontWeight: "var(--weight-light)", lineHeight: "var(--display-line-height)", letterSpacing: "var(--display-tracking)" };
 const vxBody = { margin: 0, color: "var(--text-secondary)", lineHeight: "var(--body-line-height)" };
@@ -14,11 +15,26 @@ function VxSection({ children, style, id }) {
   return <section id={id} style={{ padding: "var(--space-9) var(--page-margin)", ...style }}>{children}</section>;
 }
 
-function ServiceRow({ tag, text }) {
+/** Accordion row (one open at a time). Height reveal uses a grid-template-rows
+    0fr/1fr trick rather than animating height/padding directly, so the only
+    animated properties are grid-template-rows and opacity/transform inside —
+    no layout-thrashing height animation. */
+function ServiceRow({ tag, text, open, onToggle, id }) {
+  const panelId = `vx-service-panel-${id}`;
   return (
-    <div className="vx-service-row vx-hover-row" style={{ display: "grid", gridTemplateColumns: "210px 1fr", gap: "var(--space-5)", alignItems: "baseline", padding: "18px 0", borderTop: "1px solid var(--rule)" }}>
-      <span style={{ fontFamily: "var(--font-label)", fontSize: "var(--text-label-sm)", letterSpacing: "var(--label-tracking)", textTransform: "uppercase", color: "var(--magenta)" }}>{tag}</span>
-      <p style={{ ...vxBody, fontSize: "var(--text-body)", textAlign: "left" }}>{text}</p>
+    <div className="vx-hover-row" style={{ borderTop: "1px solid var(--rule)" }}>
+      <button type="button" onClick={onToggle} aria-expanded={open} aria-controls={panelId}
+        style={{ width: "100%", display: "grid", gridTemplateColumns: "28px 1fr", gap: "var(--space-5)", alignItems: "center",
+          padding: "20px 4px", background: "transparent", border: "none", cursor: "pointer", textAlign: "left", font: "inherit" }}>
+        <span aria-hidden="true" style={{ display: "inline-block", fontFamily: "var(--font-title)", fontSize: "18px", lineHeight: 1, color: "var(--magenta)",
+          transition: "transform var(--duration-fast) var(--ease-standard)", transform: open ? "rotate(45deg)" : "none" }}>+</span>
+        <span style={{ fontFamily: "var(--font-label)", fontSize: "var(--text-label-sm)", letterSpacing: "var(--label-tracking)", textTransform: "uppercase", color: "var(--text-primary)" }}>{tag}</span>
+      </button>
+      <div id={panelId} style={{ display: "grid", gridTemplateRows: open ? "1fr" : "0fr", transition: "grid-template-rows var(--duration-base) var(--ease-standard)" }}>
+        <div style={{ overflow: "hidden" }}>
+          <p style={{ ...vxBody, fontSize: "var(--text-body)", textAlign: "left", margin: "0 0 24px", paddingLeft: "44px" }}>{text}</p>
+        </div>
+      </div>
     </div>
   );
 }
@@ -83,7 +99,7 @@ function EraRail({ eras }) {
             {e.n}
           </span>
           <h3 style={{ ...vxSerif, fontSize: "var(--text-heading-lg)", marginTop: "16px" }}>{e.t}</h3>
-          <span style={{ display: "block", color: "var(--text-meta)", fontSize: "var(--text-heading-sm)", marginTop: "4px" }}>— {e.s}</span>
+          <span style={{ display: "block", color: "var(--text-meta)", fontSize: "var(--text-heading-sm)", marginTop: "4px" }}>{e.s}</span>
           <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "18px" }}>
             {e.items.map(it => <p key={it} style={{ ...vxBody, fontSize: "var(--text-body-sm)", margin: 0 }}>{it}</p>)}
           </div>
@@ -106,6 +122,7 @@ const JUMP_LINKS = [
 
 export function VexaPage() {
   const [activeSection, setActiveSection] = useState(JUMP_LINKS[0][0]);
+  const [openService, setOpenService] = useState(0);
 
   useEffect(() => {
     const els = JUMP_LINKS.map(([id]) => document.getElementById(id)).filter(Boolean);
@@ -147,7 +164,7 @@ export function VexaPage() {
     if (!EMAIL_RE.test(form.email.trim())) next.email = "Enter a valid work email.";
     setErrors(next);
     if (Object.keys(next).length) return;
-    const subject = `THINK conversation request — ${form.company}`;
+    const subject = `THINK conversation request from ${form.company}`;
     const body = [
       `Name: ${form.firstName} ${form.lastName}`,
       `Company: ${form.company}`,
@@ -177,7 +194,7 @@ export function VexaPage() {
       </nav>
 
       <VxSection id="vx-approach" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--space-6)", textAlign: "center" }}>
-        <h2 style={{ ...vxSerif, fontSize: "var(--text-display-lg)", maxWidth: "28ch" }}>We turn companies into AI-native enterprises — rebuilding how every function runs for the agentic era.</h2>
+        <h2 style={{ ...vxSerif, fontSize: "var(--text-display-lg)", maxWidth: "28ch" }}>We turn companies into AI-native enterprises, rebuilding how every function runs for the agentic era.</h2>
         <p style={{ ...vxBody, fontSize: "var(--text-body-lg)", color: "var(--text-primary)", maxWidth: "52ch" }}>We build your company its own <span style={vxEmphasis}>AI brain</span>. Then we hand it over.</p>
       </VxSection>
 
@@ -189,34 +206,43 @@ export function VexaPage() {
         <p style={{ ...vxBody, fontSize: "var(--text-body-lg)", color: "var(--text-primary)", marginTop: "40px", textAlign: "center" }}>No era replaces the last. The edge is running all three at once.</p>
       </VxSection>
 
-      <VxSection id="vx-mission">
-        <h2 style={{ ...vxSerif, fontSize: "var(--text-display-md)", textAlign: "center", marginBottom: "clamp(32px,5vh,56px)" }}>Our Mission — we enable companies to:</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-6) var(--space-6)", maxWidth: "980px", margin: "0 auto" }}>
-          {mission.map(m => (
-            <div key={m} className="vx-hover-row" style={{ display: "flex", gap: "14px", alignItems: "baseline", borderTop: "1px solid var(--rule)", padding: "14px 16px 18px", margin: "0 -16px" }}>
-              <span aria-hidden="true" style={{ color: "var(--magenta)", fontFamily: "var(--font-title)" }}>—</span>
-              <p style={{ ...vxBody, margin: 0, color: "var(--text-primary)", textAlign: "left" }}>{m}</p>
+      <VxSection id="vx-mission" style={{ textAlign: "left" }}>
+        <div className="vx-mission-split" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "center" }}>
+          <div>
+            <h2 style={{ ...vxSerif, fontSize: "var(--text-display-md)", marginBottom: "10px" }}>Our Mission</h2>
+            <p style={{ ...vxBody, fontSize: "var(--text-body-lg)", color: "var(--text-primary)", marginBottom: "28px" }}>We enable companies to:</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              {mission.map((m, i) => (
+                <div key={m} style={{ display: "grid", gridTemplateColumns: "28px 1fr", gap: "12px", alignItems: "baseline" }}>
+                  <span aria-hidden="true" style={{ fontFamily: "var(--font-label)", fontSize: "var(--text-label-sm)", letterSpacing: "var(--label-tracking)", color: "var(--magenta)" }}>{String(i + 1).padStart(2, "0")}</span>
+                  <p style={{ ...vxBody, margin: 0, color: "var(--text-primary)" }}>{m}</p>
+                </div>
+              ))}
             </div>
-          ))}
+            <p style={{ ...vxBody, marginTop: "28px" }}>We turn your company's knowledge into intelligence you can reuse, scale, and own.</p>
+          </div>
+          <div style={{ position: "relative", aspectRatio: "4/3", borderRadius: "var(--radius-card)", border: "1px solid var(--rule)", overflow: "hidden", background: "var(--black)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "var(--glow-signal-soft)" }}>
+            <DensityField rows={14} cols={20} seed={7} style={{ width: "86%" }} />
+          </div>
         </div>
-        <p style={{ ...vxBody, marginTop: "40px", textAlign: "center" }}>We turn your company's knowledge into intelligence you can reuse, scale, and own.</p>
       </VxSection>
 
       <VxSection style={{ textAlign: "center", backgroundImage: "linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.55)), url('/uploads/File 1.png')", backgroundSize: "cover", backgroundPosition: "center", padding: "var(--space-10) var(--page-margin)" }}>
         <h2 style={{ ...vxSerif, fontSize: "var(--text-display-lg)" }}>Different Eras.<br />Different Tools.<br />Same Mindset.</h2>
       </VxSection>
 
-      <VxSection style={{ padding: "var(--space-7) var(--page-margin)" }}>
-        <h2 style={{ ...vxSerif, fontSize: "var(--text-heading-lg)", marginBottom: "32px" }}>Three Forces. Measurable Productivity.</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "var(--space-6)" }}>
+      <VxSection style={{ textAlign: "left" }}>
+        <h2 style={{ ...vxSerif, fontSize: "var(--text-heading-lg)", marginBottom: "40px" }}>Three Forces. Measurable Productivity.</h2>
+        <div className="vx-forces-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-6)" }}>
           {[
-            ["Experience & AI-native", "Proven at global scale. One mission."],
-            ["A curated methodology", "Tailored to how your business actually runs."],
-            ["Atelier", "Your AI brain, knowledge bricks, and accelerators."],
-          ].map(([t, d]) => (
-            <div key={t} style={{ borderTop: "1px solid var(--rule)", paddingTop: "20px", textAlign: "left" }}>
-              <h3 style={{ ...vxSerif, fontSize: "var(--text-heading-lg)", marginBottom: "10px" }}>{t}</h3>
-              <p style={{ ...vxBody, fontSize: "var(--text-body)" }}>{d}</p>
+            { t: "Experience & AI-native", d: "Proven at global scale. One mission.", seed: 3 },
+            { t: "A curated methodology", d: "Tailored to how your business actually runs.", seed: 11 },
+            { t: "Atelier", d: "Your AI brain, knowledge bricks, and accelerators.", seed: 19 },
+          ].map(f => (
+            <div key={f.t} style={{ borderTop: "1px solid var(--rule)", paddingTop: "24px" }}>
+              <DensityField rows={5} cols={5} seed={f.seed} style={{ width: "44px", marginBottom: "22px" }} />
+              <h3 style={{ ...vxSerif, fontSize: "var(--text-heading-lg)", marginBottom: "10px" }}>{f.t}</h3>
+              <p style={{ ...vxBody, fontSize: "var(--text-body)" }}>{f.d}</p>
             </div>
           ))}
         </div>
@@ -249,9 +275,11 @@ export function VexaPage() {
       </VxSection>
 
       <VxSection id="vx-services">
-        <h2 style={{ ...vxSerif, fontSize: "var(--text-display-md)", marginBottom: "32px", textAlign: "center" }}>Services — from scattered knowledge to productive intelligence</h2>
+        <h2 style={{ ...vxSerif, fontSize: "var(--text-display-md)", marginBottom: "32px", textAlign: "center" }}>Services. From scattered knowledge to productive intelligence.</h2>
         <div style={{ maxWidth: "760px", margin: "0 auto" }}>
-          {services.map(([tag, text]) => <ServiceRow key={tag} tag={tag} text={text} />)}
+          {services.map(([tag, text], i) => (
+            <ServiceRow key={tag} id={i} tag={tag} text={text} open={openService === i} onToggle={() => setOpenService(openService === i ? -1 : i)} />
+          ))}
           <Rule />
         </div>
       </VxSection>

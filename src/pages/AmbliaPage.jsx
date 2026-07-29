@@ -12,7 +12,7 @@ export function AmbliaPage() {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,0.72),rgba(0,0,0,0.05))" }}></div>
         <h1 style={{ ...amSerif, position: "relative", fontSize: "var(--text-display-xl)", maxWidth: "14ch", marginLeft: "auto", marginRight: "auto" }}>Between you and <span style={amEmphasis}>your eyes</span>.</h1>
       </section>
-      <section className="am-split" style={{ padding: "clamp(64px,10vh,120px) var(--page-margin)", display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "var(--space-8)", alignItems: "center" }}>
+      <section className="am-split" style={{ padding: "clamp(64px,10vh,120px) var(--page-margin)", display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "var(--space-8)", alignItems: "center", textAlign: "left" }}>
         <h2 style={{ ...amSerif, fontSize: "var(--text-display-md)" }}>Two eyes, one brain</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-5)", fontSize: "var(--text-body-lg)" }}>
           <p style={{ ...amBody }}>Amblyopia, or lazy eye, is what happens when the brain and eyes stop working together. The brain starts ignoring signals from one eye, and that eye keeps weakening.</p>

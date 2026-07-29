@@ -122,11 +122,15 @@ span.vx-era-active {
   color: var(--magenta);
 }
 
+/* Curiosity's "Why breadth holds up" cards: middle card offset down for
+   rhythm instead of a flat 3-equal-card row. */
+.ca-why-offset {
+  margin-top: 56px;
+}
+
 /* Row-shaped layouts collapse to a stacked card under the point where four/three
    inline columns of text get too narrow to read (~640px). */
 @media (max-width: 640px) {
-  .vx-service-row,
-  .ca-method-row,
   .ca-talk-row {
     grid-template-columns: 1fr !important;
     gap: var(--space-2) !important;
@@ -134,5 +138,17 @@ span.vx-era-active {
   .am-split {
     grid-template-columns: 1fr !important;
     gap: var(--space-4) !important;
+  }
+  .vx-forces-grid,
+  .ca-why-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .ca-method-block,
+  .vx-mission-split {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-4) !important;
+  }
+  .ca-why-offset {
+    margin-top: 0;
   }
 }

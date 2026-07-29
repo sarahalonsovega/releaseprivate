@@ -18,12 +18,12 @@ export function HomePage({ go }) {
       <section style={{ position: "relative", backgroundImage: "url('/uploads/Screenshot 2026-07-27 at 9.07.19 PM.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 35%,rgba(0,0,0,0) 60%,rgba(0,0,0,0.75) 88%,#000 100%)" }}></div>
         <div style={{ position: "relative", minHeight: "88vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 var(--page-margin)" }}>
-          <h1 style={{ ...hmSerif, fontSize: "100px", fontWeight: 500, maxWidth: "12ch", margin: "0 auto" }}>Built for what's next.</h1>
+          <h1 style={{ ...hmSerif, fontSize: "var(--text-display-xl)", fontWeight: 500, maxWidth: "12ch", margin: "0 auto" }}>Built for what's next.</h1>
         </div>
         <div id="belief" style={{ position: "relative", padding: "clamp(60px,10vh,120px) var(--page-margin) var(--space-10)", display: "flex", flexDirection: "column", alignItems: "center", gap: "var(--space-6)" }}>
           <h2 style={{ ...hmTitle, fontSize: "clamp(20px,2.4vw,32px)", letterSpacing: "0.1em", maxWidth: "34ch", position: "relative", top: "20px" }}>We turn curiosity into ventures that work.</h2>
           <div style={{ maxWidth: "58ch", fontSize: "var(--text-body-lg)", color: "var(--text-primary)", lineHeight: "var(--body-line-height)", display: "flex", flexDirection: "column", gap: "var(--space-5)" }}>
-            <p style={{ margin: 0, position: "relative", top: "20px" }}>We build on one belief:<br />The best solutions come from recombination — taking proven pieces from different fields and putting them together into something new.</p>
+            <p style={{ margin: 0, position: "relative", top: "20px" }}>We build on one belief:<br />The best solutions come from recombination, taking proven pieces from different fields and putting them together into something new.</p>
             <p style={{ margin: 0, position: "relative", top: "20px" }}>So we go deep in more than one field, and build where they meet.</p>
           </div>
         </div>
@@ -31,9 +31,9 @@ export function HomePage({ go }) {
       <section style={{ background: "var(--black)", padding: "var(--space-10) var(--page-margin)" }}>
         <h2 style={{ ...hmTitle, fontSize: "clamp(22px,2.8vw,38px)", letterSpacing: "0.08em", marginBottom: "clamp(40px,6vh,72px)" }}>Our divisions. Ideas recombined.</h2>
         <div className="home-divisions" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "var(--space-6)", maxWidth: "1200px", margin: "0 auto" }}>
-          <HomeDivision image="/uploads/division-vexa.png" alt="VEXA — glowing acrylic bar forms" title="VEXA" onClick={() => go("VEXA")} />
-          <HomeDivision image="/uploads/division-curiosity.png" alt="Curiosity Architecture — glowing acrylic bar forms" title="Curiosity Architecture" onClick={() => go("Curiosity Architecture")} />
-          <HomeDivision image="/uploads/division-amblia.png" alt="AMBLIA — glowing acrylic bar forms" title="AMBLIA" onClick={() => go("AMBLIA")} />
+          <HomeDivision image="/uploads/division-vexa.png" alt="VEXA, glowing acrylic bar forms" title="VEXA" onClick={() => go("VEXA")} />
+          <HomeDivision image="/uploads/division-curiosity.png" alt="Curiosity Architecture, glowing acrylic bar forms" title="Curiosity Architecture" onClick={() => go("Curiosity Architecture")} />
+          <HomeDivision image="/uploads/division-amblia.png" alt="AMBLIA, glowing acrylic bar forms" title="AMBLIA" onClick={() => go("AMBLIA")} />
         </div>
       </section>
       <section style={{ position: "relative", backgroundImage: "url('/uploads/File 9.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
