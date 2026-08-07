@@ -69,7 +69,7 @@ function FooterLegal() {
         <Link to="/privacy" style={{ color: "var(--text-meta)" }}>Privacy Notice</Link>
         <Link to="/terms-of-use" style={{ color: "var(--text-meta)" }}>Terms of Use</Link>
         <a href="#" style={{ color: "var(--text-meta)" }}>Credits</a>
-        <a href="#" style={{ color: "var(--text-meta)" }}>LinkedIn</a>
+        <a href="https://www.linkedin.com/company/cuelum/" target="_blank" rel="noreferrer" style={{ color: "var(--text-meta)" }}>LinkedIn</a>
         <a href="mailto:hello@cuelum.com" style={{ color: "var(--text-meta)" }}>Email</a>
       </div>
       <span style={{ fontSize: "var(--text-body-sm)", color: "var(--text-meta)" }}>© 2026 CUELUM Inc. All rights reserved.</span>
