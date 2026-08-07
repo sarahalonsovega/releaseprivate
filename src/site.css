@@ -4,11 +4,71 @@
     max-width: 480px !important;
   }
 }
-.home-division:hover img {
+
+/* Statement-hero entrance reveal (MONOLOG pattern) — a one-time fade+rise on
+   load. Gated entirely behind the reduced-motion media query: outside it
+   these classes do nothing, so a reduced-motion visitor just sees the final
+   state immediately, no JS fallback needed. Used on every page's hero
+   statement; -2/-3 are spare stagger steps for whenever a hero gets a
+   second/third piece worth staggering in behind the statement. */
+@media (prefers-reduced-motion: no-preference) {
+  .hm-hero-reveal {
+    animation: hm-hero-fade-up 0.9s var(--ease-reveal) both;
+  }
+  .hm-hero-reveal-1 { animation-delay: 0.1s; }
+  .hm-hero-reveal-2 { animation-delay: 0.4s; }
+  .hm-hero-reveal-3 { animation-delay: 0.65s; }
+}
+@keyframes hm-hero-fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Home's division cards: frosted glass over the shared full-bleed field
+   photo, brightening on hover/focus the same way VEXA's era cards did
+   before that section moved to the progress-line pattern — the treatment
+   was worth keeping for exactly this kind of "few cards over one photo"
+   composition. */
+.home-division-glass {
+  transition: border-color var(--duration-fast) var(--ease-standard), box-shadow var(--duration-fast) var(--ease-standard);
+}
+/* The glass blur+tint lives on its own absolutely-positioned layer, painted
+   before the image/label (which are given position:relative to stack above
+   it). mix-blend-mode on a child of a backdrop-filter element doesn't
+   reliably composite against the *blurred* result in Chromium — only
+   against the flat background-color underneath — so the division image's
+   mix-blend-mode: screen (drops the flat-black background baked into those
+   source PNGs) needs a normal painted layer to blend against, not the
+   backdrop-filter element itself. */
+.home-division-glass-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+}
+.home-division-glass:hover,
+.home-division-glass:focus-visible {
+  border-color: var(--rule-strong);
+  box-shadow: var(--glow-signal-soft);
+}
+.home-division-glass:hover img,
+.home-division-glass:focus-visible img {
   transform: scale(1.04);
 }
-.home-division:hover h3 {
+.home-division-glass img {
+  transition: transform var(--duration-slow) var(--ease-standard);
+}
+.home-division-glass:hover h3,
+.home-division-glass:focus-visible h3 {
   color: var(--magenta-bright);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .home-division-glass-backdrop {
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }
 @keyframes vx-marquee {
   from { transform: translateX(-50%); }
@@ -88,15 +148,6 @@
   }
 }
 
-/* Scroll-scrubbed era rail (VEXA) — numeral + block light up as the reader reaches them */
-.vx-era-active {
-  opacity: 1 !important;
-}
-span.vx-era-active {
-  color: var(--magenta) !important;
-  border-color: var(--magenta) !important;
-}
-
 /* Subtle scan-assist hover on list-shaped content (service rows, era items,
    mission points) — a border/tint shift, not a click affordance. */
 .vx-hover-row {
@@ -109,42 +160,110 @@ span.vx-era-active {
   background: rgba(219, 0, 159, 0.05);
 }
 
-/* Large-type list items (VEXA effect) get a text color shift instead of
-   relying on the border/tint alone — that treatment reads as a leftover
-   default at display-type scale. */
-.vx-effect-row {
-  color: var(--text-primary);
-  transition-property: color, border-color, background-color;
-  transition-duration: var(--duration-fast);
-  transition-timing-function: var(--ease-standard);
-}
-.vx-effect-row:hover {
-  color: var(--magenta);
-}
-
 /* Curiosity's "Why breadth holds up" cards: middle card offset down for
    rhythm instead of a flat 3-equal-card row. */
 .ca-why-offset {
   margin-top: 56px;
 }
 
+/* Curiosity's Methodology rows: fade/rise in once on scroll (JS toggles
+   data-revealed, see MethodRow), image scales slightly on row hover. */
+.ca-method-row {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity var(--duration-slow) var(--ease-reveal), transform var(--duration-slow) var(--ease-reveal);
+}
+.ca-method-row[data-revealed="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+.ca-method-image img {
+  transition: transform 0.6s var(--ease-standard);
+}
+.ca-method-row:hover .ca-method-image img {
+  transform: scale(1.04);
+}
+
+/* VEXA Mission stack: the six mission lines highlight two at a time in sync
+   with the visual assembling — same dim/lit convention as .vx-story-copy
+   below. */
+.vx-mission-pair {
+  opacity: 0.35;
+  transition: opacity var(--duration-slow) var(--ease-reveal);
+}
+.vx-mission-pair.vx-mission-pair-active {
+  opacity: 1;
+}
+
+/* VEXA "evolution of work" scroll story: numeral + copy dim/lit exactly like
+   .vx-mission-pair, kept as separate classes since they're independent
+   trees (numeral rail vs copy column) rather than one wrapper. */
+.vx-story-numeral {
+  color: var(--text-meta);
+  transition: color var(--duration-base) var(--ease-standard);
+}
+.vx-story-numeral.vx-story-active {
+  color: var(--magenta);
+}
+.vx-story-copy {
+  opacity: 0.35;
+  transition: opacity var(--duration-slow) var(--ease-reveal);
+}
+.vx-story-copy.vx-story-active {
+  opacity: 1;
+}
+
+/* Services: expanding horizontal panel row on desktop, the older accordion
+   list on narrower viewports (six compressed panels read as illegible
+   slivers below this width) — CSS toggles which is shown rather than
+   re-rendering, so there's no layout-detection flash on load. */
+.vx-service-panels {
+  display: flex;
+}
+.vx-service-accordion {
+  display: none;
+}
+@media (max-width: 860px) {
+  .vx-service-panels {
+    display: none;
+  }
+  .vx-service-accordion {
+    display: block;
+  }
+}
+
+/* Curiosity's "Why breadth holds up": same expanding-panel/fallback toggle as
+   Services above, but the fallback is a plain always-expanded 3-card stack
+   (not an accordion) — three items is short enough to just show all of. */
+.ca-why-panels {
+  display: flex;
+}
+.ca-why-stack {
+  display: none;
+}
+@media (max-width: 860px) {
+  .ca-why-panels {
+    display: none;
+  }
+  .ca-why-stack {
+    display: grid;
+  }
+}
+
 /* Row-shaped layouts collapse to a stacked card under the point where four/three
    inline columns of text get too narrow to read (~640px). */
 @media (max-width: 640px) {
-  .ca-talk-row {
-    grid-template-columns: 1fr !important;
-    gap: var(--space-2) !important;
-  }
   .am-split {
     grid-template-columns: 1fr !important;
     gap: var(--space-4) !important;
   }
   .vx-forces-grid,
-  .ca-why-grid {
+  .ca-why-stack {
     grid-template-columns: 1fr !important;
   }
   .ca-method-block,
-  .vx-mission-split {
+  .vx-mission-split,
+  .vx-model-split {
     grid-template-columns: 1fr !important;
     gap: var(--space-4) !important;
   }

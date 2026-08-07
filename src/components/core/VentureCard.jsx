@@ -12,7 +12,7 @@ export function VentureCard({ label, title, description, cta = "Explore", onClic
         {label && <Label color="var(--magenta)">{label}</Label>}
         <div style={{ fontFamily: "var(--font-title)", fontSize: "22px", fontWeight: 700, letterSpacing: "0.04em", color: "var(--text-primary)" }}>{title}</div>
         {description && <p style={{ margin: 0, fontSize: "var(--text-body-sm)", color: "var(--text-secondary)", lineHeight: "var(--body-line-height)" }}>{description}</p>}
-        <div style={{ marginTop: "auto", paddingTop: "12px", fontFamily: "var(--font-label)", fontSize: "var(--text-label-sm)", letterSpacing: "var(--label-tracking)", textTransform: "uppercase", color: hover ? "var(--magenta)" : "var(--text-meta)", transition: "color var(--duration-fast) var(--ease-standard)" }}>{cta} ↗</div>
+        <div style={{ marginTop: "auto", paddingTop: "12px", fontFamily: "var(--font-label)", fontSize: "var(--text-label-sm)", letterSpacing: "var(--label-tracking)", textTransform: "uppercase", color: hover ? "var(--text-primary)" : "var(--text-meta)", transition: "color var(--duration-fast) var(--ease-standard)" }}>{cta} ↗</div>
       </div>
     </div>
   );
