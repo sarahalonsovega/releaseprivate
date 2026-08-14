@@ -1,30 +1,22 @@
 import { useState } from "react";
 
-const amSerif = {
-  margin: 0,
-  fontFamily: "var(--font-serif)",
-  fontWeight: "var(--weight-light)",
-  lineHeight: "var(--display-line-height)",
-  letterSpacing: "var(--display-tracking)",
-};
-
-const amBody = {
-  margin: 0,
-  color: "var(--text-secondary)",
-  lineHeight: "var(--body-line-height)",
-};
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function AmbliaWaitlist() {
-  const [email, setEmail] = useState("");
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "" });
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
+  const updateField = event => {
+    const { name, value } = event.target;
+    setForm(current => ({ ...current, [name]: value }));
+    if (name === "email" && error) setError("");
+  };
+
   const submit = event => {
     event.preventDefault();
-    if (!EMAIL_RE.test(email.trim())) {
-      setError("Enter a valid email address.");
+    if (!EMAIL_RE.test(form.email.trim())) {
+      setError("Please enter a valid email address.");
       return;
     }
     setError("");
@@ -32,277 +24,423 @@ function AmbliaWaitlist() {
   };
 
   if (sent) {
-    return <p className="am-waitlist-success">You're on the waitlist. We'll be in touch with updates.</p>;
+    return (
+      <p className="am-mockup-success" role="status">
+        You're on the list. We'll be in touch when AMBLIA launches.
+      </p>
+    );
   }
 
   return (
-    <form className="am-waitlist" onSubmit={submit} noValidate>
-      <label className="am-waitlist-field">
-        <span>Email address</span>
+    <form className="am-mockup-form" onSubmit={submit} noValidate>
+      <label className="am-mockup-field">
+        <span className="sr-only">First name</span>
         <input
+          name="firstName"
+          type="text"
+          value={form.firstName}
+          onChange={updateField}
+          placeholder="First Name"
+          autoComplete="given-name"
+        />
+      </label>
+      <label className="am-mockup-field">
+        <span className="sr-only">Last name</span>
+        <input
+          name="lastName"
+          type="text"
+          value={form.lastName}
+          onChange={updateField}
+          placeholder="Last Name"
+          autoComplete="family-name"
+        />
+      </label>
+      <label className="am-mockup-field am-mockup-email-field">
+        <span className="sr-only">Email</span>
+        <input
+          name="email"
           type="email"
-          value={email}
-          onChange={event => setEmail(event.target.value)}
+          value={form.email}
+          onChange={updateField}
+          placeholder="Email"
+          autoComplete="email"
           aria-invalid={Boolean(error) || undefined}
           aria-describedby={error ? "amblia-email-error" : undefined}
-          autoComplete="email"
           required
         />
-        {error && <span id="amblia-email-error" className="am-waitlist-error" role="alert">{error}</span>}
+        {error && (
+          <span id="amblia-email-error" className="am-mockup-error" role="alert">
+            {error}
+          </span>
+        )}
       </label>
-      <button type="submit">Join the waitlist</button>
+      <button type="submit">Join!</button>
     </form>
   );
 }
 
 export function AmbliaPage() {
   return (
-    <div className="am-page">
+    <main className="am-mockup-page">
       <style>{`
-        .am-hero {
+        .am-mockup-page,
+        .am-mockup-page * {
           box-sizing: border-box;
-          min-height: 100dvh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: var(--page-margin);
-          background: url('/uploads/amblia-hero.png') center 48% / cover no-repeat;
-          position: relative;
         }
-        .am-hero::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: rgba(0, 0, 0, 0.36);
-        }
-        .am-hero h1 {
-          position: relative;
-          z-index: 1;
-          text-align: center;
-          font-size: clamp(58px, 6.45vw, 98px);
-        }
-        .am-hero h1 > span {
-          display: block;
-          white-space: nowrap;
-        }
-        .am-intro {
-          box-sizing: border-box;
-          min-height: clamp(700px, 52.5vw, 800px);
-          display: grid;
-          grid-template-columns: minmax(0, 43%) minmax(0, 1fr);
-          gap: clamp(44px, 4vw, 72px);
-          align-items: center;
-          padding: clamp(116px, 9.5vw, 146px) var(--page-margin) clamp(90px, 8vw, 124px) 0;
-        }
-        .am-intro-media {
-          width: 100%;
-          aspect-ratio: 1.18 / 1;
+        .am-mockup-page {
           overflow: hidden;
+          background: #fff;
+          color: #24252c;
+          font-family: var(--font-sans);
         }
-        .am-intro-media img {
+        .am-mockup-hero {
+          position: relative;
+          width: auto;
+          aspect-ratio: 2.025 / 1;
+          margin: clamp(18px, 2.45vw, 74px);
+          margin-bottom: 0;
+          border-radius: clamp(8px, .55vw, 17px);
+          background: #000;
+        }
+        .am-mockup-hero-copy {
+          position: absolute;
+          z-index: 1;
+          top: 49.5%;
+          left: 8.4%;
+          width: 42%;
+          transform: translateY(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          color: #fff;
+          text-align: center;
+        }
+        .am-mockup-brand {
+          margin: 0 0 clamp(28px, 2.8vw, 84px);
+          font-family: var(--font-title);
+          font-size: clamp(1.35rem, 2.05vw, 3.85rem);
+          font-weight: 700;
+          line-height: 1;
+          letter-spacing: .025em;
+        }
+        .am-mockup-hero h1 {
+          max-width: 8.5ch;
+          margin: 0;
+          color: #fff;
+          font-family: var(--font-serif);
+          font-size: clamp(3.1rem, 4.75vw, 8.9rem);
+          font-weight: 300;
+          line-height: .92;
+          letter-spacing: -.04em;
+          text-wrap: balance;
+        }
+        .am-mockup-bars {
+          position: absolute;
+          z-index: 2;
+          top: 2%;
+          left: 42.5%;
+          width: 68%;
+          max-width: none;
+          height: auto;
+          pointer-events: none;
+          user-select: none;
+        }
+        .am-mockup-intro {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: clamp(140px, 10.4vw, 315px) clamp(24px, 6vw, 180px) 0;
+          text-align: center;
+        }
+        .am-mockup-intro-copy {
+          width: min(100%, 70ch);
+          display: flex;
+          flex-direction: column;
+          gap: clamp(44px, 3.6vw, 108px);
+        }
+        .am-mockup-intro p,
+        .am-mockup-burden p,
+        .am-mockup-signup-copy {
+          margin: 0;
+          font-size: clamp(1rem, 1.34vw, 2.5rem);
+          font-weight: 400;
+          line-height: 1.42;
+          letter-spacing: -.018em;
+          text-wrap: pretty;
+        }
+        .am-mockup-patch {
+          width: calc(100% + clamp(0px, 7.1vw, 214px));
+          margin-top: clamp(120px, 8.6vw, 260px);
+          overflow: hidden;
+          aspect-ratio: 3.62 / 1;
+          border-radius: clamp(8px, .55vw, 17px);
+          background: #eee;
+        }
+        .am-mockup-patch img {
           width: 100%;
           height: 100%;
           display: block;
           object-fit: cover;
-          object-position: center 42%;
+          object-position: center 54%;
         }
-        .am-intro-copy {
-          max-width: 730px;
-          display: flex;
-          flex-direction: column;
-          gap: 20px;
-          text-align: left;
-        }
-        .am-intro-copy h2 {
-          align-self: center;
-          margin-bottom: 12px;
-          font-size: clamp(24px, 1.85vw, 28px);
-          font-style: italic;
-        }
-        .am-intro-copy p {
-          font-size: clamp(14px, 1vw, 16px);
-        }
-        .am-intro-copy p:last-child {
-          color: rgba(255, 255, 255, 0.76);
-        }
-        .am-why {
-          box-sizing: border-box;
-          min-height: clamp(590px, 42vw, 680px);
-          display: flex;
-          align-items: flex-start;
-          justify-content: center;
-          padding: clamp(90px, 7vw, 108px) var(--page-margin) clamp(130px, 10vw, 160px);
-          text-align: center;
-        }
-        .am-why-inner {
-          max-width: 760px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .am-why-label {
-          margin: 0 0 28px;
-          color: rgba(255, 255, 255, 0.55);
-          font-family: var(--font-label);
-          font-size: var(--text-label);
-          font-weight: var(--weight-regular);
-          letter-spacing: 0.06em;
-          line-height: 1;
-          text-transform: uppercase;
-        }
-        .am-why h2 {
-          max-width: 18ch;
-          margin-bottom: 32px;
-          font-size: clamp(30px, 2.35vw, 36px);
-        }
-        .am-why p {
-          max-width: 66ch;
-          font-size: clamp(14px, 1vw, 16px);
-        }
-        .am-why p + p {
-          margin-top: 24px;
-        }
-        .am-cta {
-          box-sizing: border-box;
-          min-height: 520px;
-          display: flex;
-          justify-content: flex-start;
-          align-items: center;
-          flex-direction: column;
-          padding: clamp(120px, 10vw, 152px) var(--page-margin) 80px;
-          text-align: center;
-          background: var(--black);
-        }
-        .am-cta h2 {
-          font-size: clamp(42px, 4.6vw, 70px);
-          white-space: nowrap;
-        }
-        .am-cta-copy {
-          max-width: 48ch;
-          font-size: clamp(13px, 0.95vw, 15px);
-        }
-        .am-waitlist {
-          width: min(100%, 520px);
-          margin: 34px auto 0;
+        .am-mockup-burden {
+          width: calc(100% + clamp(0px, 7.1vw, 214px));
+          min-height: clamp(360px, 27.25vw, 824px);
+          margin-top: clamp(12px, .9vw, 28px);
+          padding: clamp(58px, 5.5vw, 166px) clamp(36px, 7vw, 212px);
           display: grid;
-          grid-template-columns: minmax(0, 1fr) auto;
-          gap: 44px;
-          align-items: start;
+          grid-template-columns: 1fr 1fr;
+          gap: clamp(50px, 6vw, 180px);
+          align-items: center;
+          border-radius: clamp(8px, .55vw, 17px);
+          background: #000;
+          color: #fff;
           text-align: left;
         }
-        .am-waitlist-field {
-          position: relative;
+        .am-mockup-burden h2 {
+          margin: 0;
+          font-family: var(--font-serif);
+          font-size: clamp(2.8rem, 4.45vw, 8.4rem);
+          font-weight: 300;
+          line-height: .88;
+          letter-spacing: -.04em;
+          text-align: center;
+          text-wrap: balance;
+        }
+        .am-mockup-burden-copy {
           display: flex;
           flex-direction: column;
-          color: rgba(255, 255, 255, 0.66);
-          font-family: var(--font-label);
-          font-size: var(--text-label);
-          letter-spacing: var(--label-tracking);
-          text-transform: uppercase;
+          gap: clamp(38px, 3vw, 90px);
         }
-        .am-waitlist input {
+        .am-mockup-burden p {
+          color: #fff;
+          font-size: clamp(.95rem, 1.15vw, 2.18rem);
+          line-height: 1.35;
+        }
+        .am-mockup-signup {
+          min-height: clamp(920px, 78vw, 2360px);
+          padding: clamp(155px, 10.3vw, 312px) 24px clamp(300px, 28vw, 846px);
+          text-align: center;
+        }
+        .am-mockup-tag {
+          display: inline-flex;
+          min-height: clamp(48px, 4.2vw, 126px);
+          align-items: center;
+          justify-content: center;
+          padding: 0 clamp(22px, 2.25vw, 68px);
+          border-radius: clamp(7px, .55vw, 17px);
+          background: #000;
+          color: #9b9ba0;
+          font-size: clamp(.84rem, 1.02vw, 1.92rem);
+        }
+        .am-mockup-signup h2 {
+          margin: clamp(52px, 4.35vw, 132px) auto clamp(48px, 3.7vw, 112px);
+          color: #151515;
+          font-family: var(--font-serif);
+          font-size: clamp(2.75rem, 4.45vw, 8.4rem);
+          font-weight: 300;
+          line-height: .95;
+          letter-spacing: -.04em;
+          text-wrap: balance;
+        }
+        .am-mockup-signup-copy {
+          max-width: 55ch;
+          margin: 0 auto;
+          color: #55565d;
+          font-size: clamp(.98rem, 1.16vw, 2.18rem);
+          line-height: 1.35;
+        }
+        .am-mockup-form {
+          width: min(100%, 780px);
+          margin: clamp(52px, 4.5vw, 136px) auto 0;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: clamp(22px, 2.1vw, 64px);
+          align-items: start;
+        }
+        .am-mockup-field {
+          position: relative;
+          display: block;
+        }
+        .am-mockup-field input {
           width: 100%;
-          min-height: 32px;
-          box-sizing: border-box;
+          min-height: clamp(42px, 3.7vw, 112px);
+          padding: 0 4px clamp(11px, 1vw, 30px);
           border: 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+          border-bottom: 1px solid #aaaab0;
           border-radius: 0;
           outline: 0;
           background: transparent;
-          color: var(--white);
-          font: 15px var(--font-sans);
+          color: #24252c;
+          font: clamp(.9rem, 1.08vw, 2.05rem) var(--font-sans);
+          text-align: center;
         }
-        .am-waitlist input:focus {
-          border-color: rgba(255, 255, 255, 0.52);
+        .am-mockup-field input::placeholder {
+          color: #74757d;
+          opacity: 1;
         }
-        .am-waitlist button {
-          border: 0;
-          border-radius: var(--radius-control);
-          padding: 11px 18px;
-          background: var(--grey-70);
-          color: var(--grey-20);
-          cursor: pointer;
-          font-family: var(--font-label);
-          font-size: var(--text-label);
-          letter-spacing: var(--label-tracking);
-          text-transform: uppercase;
-          transition: background-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+        .am-mockup-field input:focus {
+          border-color: #df008c;
         }
-        .am-waitlist button:hover,
-        .am-waitlist button:focus-visible {
-          background: var(--grey-40);
-          color: var(--white);
-        }
-        .am-waitlist-error {
+        .am-mockup-error {
           position: absolute;
-          top: calc(100% + 6px);
-          color: var(--magenta-bright);
+          top: calc(100% + 9px);
+          left: 0;
+          width: 100%;
+          color: #b0006f;
+          font-size: .8rem;
+          text-align: center;
+        }
+        .am-mockup-form button {
+          grid-column: 1 / -1;
+          justify-self: center;
+          min-width: clamp(104px, 9.3vw, 280px);
+          min-height: clamp(50px, 4.15vw, 126px);
+          margin-top: clamp(34px, 2.9vw, 88px);
+          padding: 0 clamp(24px, 2vw, 60px);
+          border: 0;
+          border-radius: clamp(7px, .55vw, 17px);
+          background: #df008c;
+          color: #fff;
           font-family: var(--font-sans);
-          font-size: var(--text-body-sm);
-          letter-spacing: 0;
-          text-transform: none;
+          font-size: clamp(.95rem, 1.08vw, 2.05rem);
+          cursor: pointer;
+          transition: background-color .2s ease, transform .2s ease;
         }
-        .am-waitlist-success {
-          margin: 34px auto 0;
-          color: var(--grey-20);
+        .am-mockup-form button:hover,
+        .am-mockup-form button:focus-visible {
+          background: #bd0078;
         }
-        @media (max-width: 720px) {
-          .am-hero { min-height: 100dvh; }
-          .am-hero h1 { font-size: clamp(50px, 15vw, 72px); }
-          .am-intro {
-            min-height: 0;
+        .am-mockup-form button:active {
+          transform: translateY(1px);
+        }
+        .am-mockup-success {
+          width: min(100%, 52ch);
+          margin: clamp(52px, 4.5vw, 136px) auto 0;
+          color: #3f4047;
+          font-size: clamp(1rem, 1.16vw, 2.18rem);
+        }
+        @media (max-width: 760px) {
+          .am-mockup-hero {
+            min-height: 660px;
+            aspect-ratio: auto;
+            margin: 12px;
+          }
+          .am-mockup-hero-copy {
+            top: 35%;
+            left: 7%;
+            width: 68%;
+            align-items: flex-start;
+            text-align: left;
+          }
+          .am-mockup-brand {
+            margin-bottom: 30px;
+            font-size: 1.3rem;
+          }
+          .am-mockup-hero h1 {
+            max-width: 7.5ch;
+            font-size: clamp(3.3rem, 15vw, 4.8rem);
+            line-height: .9;
+          }
+          .am-mockup-bars {
+            top: 47%;
+            left: 7%;
+            width: 132%;
+          }
+          .am-mockup-intro {
+            padding: 112px 18px 0;
+          }
+          .am-mockup-intro-copy {
+            gap: 36px;
+          }
+          .am-mockup-intro p,
+          .am-mockup-burden p,
+          .am-mockup-signup-copy {
+            font-size: 1rem;
+          }
+          .am-mockup-patch {
+            width: 100%;
+            margin-top: 96px;
+            aspect-ratio: 1.8 / 1;
+          }
+          .am-mockup-patch img {
+            object-position: 51% 52%;
+          }
+          .am-mockup-burden {
+            width: 100%;
+            min-height: 560px;
+            margin-top: 10px;
+            padding: 64px 28px;
             grid-template-columns: 1fr;
-            gap: 48px;
-            padding: 88px 24px 100px;
+            gap: 58px;
+            text-align: center;
           }
-          .am-intro-media {
-            width: calc(100% + 48px);
-            margin-left: -24px;
+          .am-mockup-burden h2 {
+            font-size: clamp(2.8rem, 14vw, 4.2rem);
           }
-          .am-intro-copy { text-align: left; }
-          .am-why { min-height: 600px; padding: 96px 24px 140px; }
-          .am-cta { min-height: 600px; padding: 100px 24px 150px; }
-          .am-cta h2 { white-space: normal; }
-          .am-waitlist { grid-template-columns: 1fr; gap: 18px; }
-          .am-waitlist button { justify-self: center; margin-top: 12px; }
+          .am-mockup-signup {
+            min-height: 1040px;
+            padding: 140px 24px 330px;
+          }
+          .am-mockup-signup h2 {
+            max-width: 10ch;
+            font-size: clamp(2.8rem, 13.5vw, 4rem);
+          }
+          .am-mockup-form {
+            width: min(100%, 420px);
+            grid-template-columns: 1fr;
+            gap: 30px;
+          }
+          .am-mockup-form button {
+            grid-column: auto;
+            margin-top: 16px;
+          }
         }
       `}</style>
 
-      <section className="am-hero">
-        <h1 style={amSerif}>
-          <span>Between you</span>
-          <span>and your <em style={{ fontWeight: "inherit" }}>eyes</em>.</span>
-        </h1>
+      <section className="am-mockup-hero" aria-labelledby="amblia-title">
+        <div className="am-mockup-hero-copy">
+          <p className="am-mockup-brand">AMBLIA</p>
+          <h1 id="amblia-title">Between you and your eyes</h1>
+        </div>
+        <img
+          className="am-mockup-bars"
+          src="/uploads/amblia-mockup-bars.png"
+          alt=""
+          aria-hidden="true"
+          fetchPriority="high"
+        />
       </section>
 
-      <section className="am-intro">
-        <div className="am-intro-media">
-          <img src="/uploads/amblia-vision-cells.png" alt="A closed eye in close detail" />
+      <section className="am-mockup-intro" aria-label="About AMBLIA">
+        <div className="am-mockup-intro-copy">
+          <p>Amblyopia (lazy eye), is what happens when the brain and eyes stop working together. The brain starts ignoring signals from one eye, and that eye keeps weakening.</p>
+          <p>The standard fix is still the patch, started in childhood. It's uncomfortable, and it only works if the child actually wears it.</p>
+          <p>AMBLIA builds the therapy into something a child already wants to wear. Nothing to fight over, nothing to notice. The treatment runs in the background, and the child just goes about their day.</p>
         </div>
-        <div className="am-intro-copy">
-          <h2 style={amSerif}>Two eyes, one brain</h2>
-          <p style={amBody}>Amblyopia, or lazy eye, is what happens when the brain and eyes stop working together. The brain starts ignoring signals from one eye, and that eye keeps weakening.</p>
-          <p style={amBody}>The standard fix is still the patch, started in childhood. It's uncomfortable, and it only works if the child actually wears it. That's exactly where it falls apart.</p>
-          <p style={amBody}>AMBLIA builds the therapy into something a child already wants to wear. Nothing to fight over, nothing to notice. The treatment runs in the background, and the child just goes about their day.</p>
+
+        <div className="am-mockup-patch">
+          <img
+            src="/uploads/amblia-patch-child.png"
+            alt="A child placing an eye patch over one eye"
+          />
         </div>
+
+        <section className="am-mockup-burden" aria-labelledby="amblia-burden-title">
+          <h2 id="amblia-burden-title">Treatment should not<br />feel like a burden</h2>
+          <div className="am-mockup-burden-copy">
+            <p>The hard part of was never the science. It's getting a child to keep wearing something they hate.</p>
+            <p>AMBLIA starts from the opposite place:<br />something they will not even notice they are wearing.</p>
+          </div>
+        </section>
       </section>
 
-      <section className="am-why">
-        <div className="am-why-inner">
-          <p className="am-why-label">Why it matters</p>
-          <h2 style={amSerif}>Treatment shouldn't<br />feel like treatment.</h2>
-          <p style={amBody}>The hard part of amblyopia was never the science. It's getting a child to keep<br className="am-desktop-break" /> wearing something they hate.</p>
-          <p style={amBody}>AMBLIA starts from the opposite place: something they'd choose to wear anyway.</p>
-        </div>
+      <section className="am-mockup-signup" aria-labelledby="amblia-signup-title">
+        <span className="am-mockup-tag">Sign up to the mail list</span>
+        <h2 id="amblia-signup-title">No patches. No fighting. Just vision.</h2>
+        <p className="am-mockup-signup-copy">We're not ready to show you what we're building yet.<br />Join the list and you'll be the first to know when it launches.</p>
+        <AmbliaWaitlist />
       </section>
-
-      <section className="am-cta">
-        <div>
-          <h2 style={amSerif}>No patches. No fighting. Just <em style={{ fontWeight: "inherit" }}>vision</em>.</h2>
-          <p className="am-cta-copy" style={{ ...amBody, margin: "clamp(64px, 5.3vw, 82px) auto 0" }}>We're not ready to show you what we're building yet.<br />Join the list and you'll be the first to know when it launches.</p>
-          <AmbliaWaitlist />
-        </div>
-      </section>
-    </div>
+    </main>
   );
 }

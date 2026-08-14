@@ -9,12 +9,12 @@ import { ThreeBarMark } from "./ThreeBarMark.jsx";
     mailto:) so the underlying anchor's href is correct for hover/middle-click/
     cmd-click, even though the primary click is intercepted for SPA nav via
     `onNavigate` (which also resets scroll and refreshes ScrollTrigger). */
-export function NavBar({ links = ["Cuelum", "Vexa", "Curiosity Architecture", "Amblia"], active, hrefs, onNavigate, onWordmarkClick, wordmarkSrc, style }) {
+export function NavBar({ links = ["VEXA", "Curiosity Architecture", "AMBLIA", "About", "Contact"], active, hrefs, onNavigate, onWordmarkClick, wordmarkSrc, style }) {
   return (
     <nav className="site-nav" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px var(--page-margin)", background: "var(--black)",
       transitionProperty: "background-color", transitionDuration: "var(--duration-base)", transitionTimingFunction: "var(--ease-standard)", ...style }}>
       <div style={{ display: "flex", alignItems: "center", gap: "14px", cursor: onWordmarkClick ? "pointer" : "default", flexShrink: 0 }} onClick={onWordmarkClick}>
-        {wordmarkSrc ? <img src={wordmarkSrc} alt="CUELUM" style={{ height: "16px" }} /> : <><ThreeBarMark width={20} /><span style={{ fontFamily: "var(--font-title)", fontWeight: 700, letterSpacing: "0.22em", fontSize: "15px" }}>CUELUM</span></>}
+        {wordmarkSrc ? <img src={wordmarkSrc} alt="CUELUM" style={{ height: "16px" }} /> : <><ThreeBarMark width={20} /><span style={{ fontFamily: "var(--font-title)", fontWeight: 700, letterSpacing: "0.22em", fontSize: "var(--type-body)" }}>CUELUM</span></>}
       </div>
       <div className="site-nav-links" style={{ display: "flex", alignItems: "center", gap: "28px" }}>
         {links.map(l => (
