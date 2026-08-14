@@ -24,3 +24,4 @@ Open the printed `http://localhost:5173` URL in your browser.
 
 `project/` is the original Claude Design export (untouched) — keep it around as a reference for anything not yet ported, but new edits should happen here in `website/`.
 # cuelumsitereleasev1
+# releaseprivate
