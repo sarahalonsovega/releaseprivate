@@ -4,32 +4,40 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function AmbliaWaitlist() {
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "" });
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
 
   const updateField = event => {
     const { name, value } = event.target;
     setForm(current => ({ ...current, [name]: value }));
-    if (name === "email" && error) setError("");
+    if (errors[name]) {
+      setErrors(current => ({ ...current, [name]: "" }));
+    }
   };
 
   const submit = event => {
     event.preventDefault();
-    if (!EMAIL_RE.test(form.email.trim())) {
-      setError("Please enter a valid email address.");
+    const nextErrors = {};
+    if (!form.firstName.trim()) nextErrors.firstName = "Please enter your first name.";
+    if (!form.lastName.trim()) nextErrors.lastName = "Please enter your last name.";
+    if (!EMAIL_RE.test(form.email.trim())) nextErrors.email = "Please enter a valid email address.";
+
+    if (Object.keys(nextErrors).length) {
+      setErrors(nextErrors);
       return;
     }
-    setError("");
-    setSent(true);
-  };
 
-  if (sent) {
-    return (
-      <p className="am-mockup-success" role="status">
-        You're on the list. We'll be in touch when AMBLIA launches.
-      </p>
-    );
-  }
+    setErrors({});
+    const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`;
+    const subject = encodeURIComponent(`AMBLIA waitlist - ${fullName}`);
+    const body = encodeURIComponent([
+      "AMBLIA waitlist request",
+      "",
+      `First name: ${form.firstName.trim()}`,
+      `Last name: ${form.lastName.trim()}`,
+      `Email: ${form.email.trim()}`,
+    ].join("\n"));
+    window.location.href = `mailto:hello@cuelum.com?subject=${subject}&body=${body}`;
+  };
 
   return (
     <form className="am-mockup-form" onSubmit={submit} noValidate>
@@ -42,7 +50,15 @@ function AmbliaWaitlist() {
           onChange={updateField}
           placeholder="First Name"
           autoComplete="given-name"
+          aria-invalid={Boolean(errors.firstName) || undefined}
+          aria-describedby={errors.firstName ? "amblia-first-name-error" : undefined}
+          required
         />
+        {errors.firstName && (
+          <span id="amblia-first-name-error" className="am-mockup-error" role="alert">
+            {errors.firstName}
+          </span>
+        )}
       </label>
       <label className="am-mockup-field">
         <span className="sr-only">Last name</span>
@@ -53,7 +69,15 @@ function AmbliaWaitlist() {
           onChange={updateField}
           placeholder="Last Name"
           autoComplete="family-name"
+          aria-invalid={Boolean(errors.lastName) || undefined}
+          aria-describedby={errors.lastName ? "amblia-last-name-error" : undefined}
+          required
         />
+        {errors.lastName && (
+          <span id="amblia-last-name-error" className="am-mockup-error" role="alert">
+            {errors.lastName}
+          </span>
+        )}
       </label>
       <label className="am-mockup-field am-mockup-email-field">
         <span className="sr-only">Email</span>
@@ -64,13 +88,13 @@ function AmbliaWaitlist() {
           onChange={updateField}
           placeholder="Email"
           autoComplete="email"
-          aria-invalid={Boolean(error) || undefined}
-          aria-describedby={error ? "amblia-email-error" : undefined}
+          aria-invalid={Boolean(errors.email) || undefined}
+          aria-describedby={errors.email ? "amblia-email-error" : undefined}
           required
         />
-        {error && (
+        {errors.email && (
           <span id="amblia-email-error" className="am-mockup-error" role="alert">
-            {error}
+            {errors.email}
           </span>
         )}
       </label>
@@ -105,10 +129,10 @@ export function AmbliaPage() {
         .am-mockup-hero-copy {
           position: absolute;
           z-index: 1;
-          top: 49.5%;
-          left: 8.4%;
-          width: 42%;
-          transform: translateY(-50%);
+          top: 50%;
+          left: 50%;
+          width: min(72%, 980px);
+          transform: translate(-50%, -50%);
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -116,7 +140,7 @@ export function AmbliaPage() {
           text-align: center;
         }
         .am-mockup-brand {
-          margin: 0 0 clamp(28px, 2.8vw, 84px);
+          margin: 0 0 clamp(30px, 2.25vw, 68px);
           font-family: var(--font-title);
           font-size: clamp(1.35rem, 2.05vw, 3.85rem);
           font-weight: 700;
@@ -124,45 +148,34 @@ export function AmbliaPage() {
           letter-spacing: .025em;
         }
         .am-mockup-hero h1 {
-          max-width: 8.5ch;
+          max-width: none;
           margin: 0;
           color: #fff;
           font-family: var(--font-serif);
-          font-size: clamp(3.1rem, 4.75vw, 8.9rem);
+          font-size: clamp(3.1rem, 4.45vw, 8.4rem);
           font-weight: 300;
           line-height: .92;
           letter-spacing: -.04em;
           text-wrap: balance;
         }
-        .am-mockup-bars {
-          position: absolute;
-          z-index: 2;
-          top: 2%;
-          left: 42.5%;
-          width: 68%;
-          max-width: none;
-          height: auto;
-          pointer-events: none;
-          user-select: none;
-        }
         .am-mockup-intro {
           display: flex;
           flex-direction: column;
           align-items: center;
-          padding: clamp(140px, 10.4vw, 315px) clamp(24px, 6vw, 180px) 0;
+          padding: clamp(126px, 7.9vw, 239px) clamp(24px, 6vw, 180px) 0;
           text-align: center;
         }
         .am-mockup-intro-copy {
-          width: min(100%, 70ch);
+          width: min(100%, 66ch);
           display: flex;
           flex-direction: column;
-          gap: clamp(44px, 3.6vw, 108px);
+          gap: clamp(44px, 4vw, 121px);
         }
         .am-mockup-intro p,
         .am-mockup-burden p,
         .am-mockup-signup-copy {
           margin: 0;
-          font-size: clamp(1rem, 1.34vw, 2.5rem);
+          font-size: clamp(1rem, 1.4vw, 2.65rem);
           font-weight: 400;
           line-height: 1.42;
           letter-spacing: -.018em;
@@ -181,7 +194,7 @@ export function AmbliaPage() {
           height: 100%;
           display: block;
           object-fit: cover;
-          object-position: center 54%;
+          object-position: center 55%;
         }
         .am-mockup-burden {
           width: calc(100% + clamp(0px, 7.1vw, 214px));
@@ -218,8 +231,8 @@ export function AmbliaPage() {
           line-height: 1.35;
         }
         .am-mockup-signup {
-          min-height: clamp(920px, 78vw, 2360px);
-          padding: clamp(155px, 10.3vw, 312px) 24px clamp(300px, 28vw, 846px);
+          min-height: clamp(820px, 55vw, 1660px);
+          padding: clamp(155px, 10.3vw, 312px) 24px clamp(250px, 18vw, 544px);
           text-align: center;
         }
         .am-mockup-tag {
@@ -229,8 +242,8 @@ export function AmbliaPage() {
           justify-content: center;
           padding: 0 clamp(22px, 2.25vw, 68px);
           border-radius: clamp(7px, .55vw, 17px);
-          background: #000;
-          color: #9b9ba0;
+          background: #4b211a;
+          color: #d7cdca;
           font-size: clamp(.84rem, 1.02vw, 1.92rem);
         }
         .am-mockup-signup h2 {
@@ -314,12 +327,6 @@ export function AmbliaPage() {
         .am-mockup-form button:active {
           transform: translateY(1px);
         }
-        .am-mockup-success {
-          width: min(100%, 52ch);
-          margin: clamp(52px, 4.5vw, 136px) auto 0;
-          color: #3f4047;
-          font-size: clamp(1rem, 1.16vw, 2.18rem);
-        }
         @media (max-width: 760px) {
           .am-mockup-hero {
             min-height: 660px;
@@ -327,11 +334,11 @@ export function AmbliaPage() {
             margin: 12px;
           }
           .am-mockup-hero-copy {
-            top: 35%;
-            left: 7%;
-            width: 68%;
-            align-items: flex-start;
-            text-align: left;
+            top: 50%;
+            left: 50%;
+            width: 88%;
+            align-items: center;
+            text-align: center;
           }
           .am-mockup-brand {
             margin-bottom: 30px;
@@ -341,11 +348,6 @@ export function AmbliaPage() {
             max-width: 7.5ch;
             font-size: clamp(3.3rem, 15vw, 4.8rem);
             line-height: .9;
-          }
-          .am-mockup-bars {
-            top: 47%;
-            left: 7%;
-            width: 132%;
           }
           .am-mockup-intro {
             padding: 112px 18px 0;
@@ -379,8 +381,8 @@ export function AmbliaPage() {
             font-size: clamp(2.8rem, 14vw, 4.2rem);
           }
           .am-mockup-signup {
-            min-height: 1040px;
-            padding: 140px 24px 330px;
+            min-height: 920px;
+            padding: 140px 24px 260px;
           }
           .am-mockup-signup h2 {
             max-width: 10ch;
@@ -396,20 +398,26 @@ export function AmbliaPage() {
             margin-top: 16px;
           }
         }
+        @media (prefers-reduced-motion: reduce) {
+          .am-mockup-page *,
+          .am-mockup-page *::before,
+          .am-mockup-page *::after {
+            scroll-behavior: auto !important;
+            transition-duration: .01ms !important;
+            animation-duration: .01ms !important;
+            animation-iteration-count: 1 !important;
+          }
+          .am-mockup-form button:active {
+            transform: none;
+          }
+        }
       `}</style>
 
       <section className="am-mockup-hero" aria-labelledby="amblia-title">
         <div className="am-mockup-hero-copy">
           <p className="am-mockup-brand">AMBLIA</p>
-          <h1 id="amblia-title">Between you and your eyes</h1>
+          <h1 id="amblia-title">Between you<br />and your eyes</h1>
         </div>
-        <img
-          className="am-mockup-bars"
-          src="/uploads/amblia-mockup-bars.png"
-          alt=""
-          aria-hidden="true"
-          fetchPriority="high"
-        />
       </section>
 
       <section className="am-mockup-intro" aria-label="About AMBLIA">
@@ -421,7 +429,7 @@ export function AmbliaPage() {
 
         <div className="am-mockup-patch">
           <img
-            src="/uploads/amblia-patch-child.png"
+            src="/uploads/amblia-eye-patch.png"
             alt="A child placing an eye patch over one eye"
           />
         </div>

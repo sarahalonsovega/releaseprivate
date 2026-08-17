@@ -1,17 +1,24 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const whyItems = [
   {
     title: "It compounds instead of resetting",
     body: "When one track disappears, a single-track career starts from zero. A portfolio doesn't, because each field brings methods the others can use.",
+    image: "/uploads/curiosity-why-dna.png",
   },
   {
     title: "It's the part AI doesn't take",
     body: "The value moves to framing the problem, choosing what to borrow, and judging what's worth building: the work between fields, not inside one.",
+    image: "/uploads/curiosity-why-code.png",
   },
   {
     title: "It's the safer bet",
     body: "Most real advances are imports, a method from one field solving a problem in another. You can't see that from inside a single field. Three fields that talk to each other is a hedge, not a scatter.",
+    image: "/uploads/curiosity-why-chips.png",
   },
 ];
 
@@ -32,11 +39,65 @@ const methodology = [
 
 function WhyArchitectureWorks() {
   const [active, setActive] = useState(0);
+  const sectionRef = useRef(null);
+  const activeRef = useRef(0);
+
+  const selectPanel = (index) => {
+    activeRef.current = index;
+    setActive(index);
+  };
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return undefined;
+
+    const media = gsap.matchMedia();
+    media.add(
+      {
+        canPin: "(min-width: 761px) and (prefers-reduced-motion: no-preference)",
+      },
+      ({ conditions }) => {
+        if (!conditions.canPin) return undefined;
+
+        const trigger = ScrollTrigger.create({
+          id: "curiosity-why-pin",
+          trigger: section,
+          start: "top top",
+          end: () => `+=${window.innerHeight * 2.65}`,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: ({ progress }) => {
+            const next = Math.min(2, Math.floor(progress * 3));
+            if (next !== activeRef.current) selectPanel(next);
+          },
+        });
+
+        return () => trigger.kill();
+      },
+    );
+
+    return () => media.revert();
+  }, []);
+
+  const handleKeyDown = (event, index) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    let next = index;
+    if (event.key === "ArrowLeft") next = (index + whyItems.length - 1) % whyItems.length;
+    if (event.key === "ArrowRight") next = (index + 1) % whyItems.length;
+    if (event.key === "Home") next = 0;
+    if (event.key === "End") next = whyItems.length - 1;
+    selectPanel(next);
+    sectionRef.current?.querySelectorAll(".ca2-why-panel")[next]?.focus();
+  };
 
   return (
-    <section className="ca2-why" aria-labelledby="ca2-why-title">
-      <h2 id="ca2-why-title">Why Curiosity Architecture<br />works long term</h2>
-      <div className="ca2-why-panels" role="group" aria-label="Why Curiosity Architecture works long term">
+    <section className="ca2-why" ref={sectionRef} aria-labelledby="ca2-why-title">
+      <div className="ca2-why-inner">
+        <h2 id="ca2-why-title">Why Curiosity Architecture<br />works long term</h2>
+        <div className="ca2-why-panels" role="group" aria-label="Why Curiosity Architecture works long term">
         {whyItems.map((item, index) => {
           const isActive = active === index;
           return (
@@ -46,7 +107,9 @@ function WhyArchitectureWorks() {
               key={item.title}
               type="button"
               aria-expanded={isActive}
-              onClick={() => setActive(index)}
+              onClick={() => selectPanel(index)}
+              onKeyDown={(event) => handleKeyDown(event, index)}
+              style={{ backgroundImage: `linear-gradient(rgba(0,0,0,${isActive ? ".48" : ".58"}), rgba(0,0,0,${isActive ? ".48" : ".58"})), url("${item.image}")` }}
             >
               <span className="ca2-why-panel-inner">
                 <span className="ca2-why-panel-title">{item.title}</span>
@@ -55,6 +118,7 @@ function WhyArchitectureWorks() {
             </button>
           );
         })}
+        </div>
       </div>
     </section>
   );
@@ -135,16 +199,16 @@ export function CuriosityPage() {
           position: absolute;
           z-index: 2;
           top: 49%;
-          left: 5.4%;
-          width: 43.5%;
-          transform: translateY(-50%);
+          left: 50%;
+          width: 70%;
+          transform: translate(-50%, -50%);
           display: flex;
           flex-direction: column;
           align-items: center;
           color: #fff;
         }
         .ca2-wordmark {
-          margin-bottom: clamp(32px, 3.7vw, 112px);
+          margin-bottom: clamp(28px, 2.7vw, 82px);
           font-family: var(--font-title);
           font-size: clamp(1.35rem, 2.1vw, 4rem);
           font-weight: 700;
@@ -156,17 +220,6 @@ export function CuriosityPage() {
           color: #fff;
           font-size: clamp(3rem, 4.8vw, 9.1rem);
           line-height: .9;
-        }
-        .ca2-hero-bars {
-          position: absolute;
-          z-index: 1;
-          top: 3%;
-          left: 43%;
-          width: 82%;
-          height: auto;
-          max-width: none;
-          pointer-events: none;
-          user-select: none;
         }
         .ca2-intro {
           display: flex;
@@ -190,7 +243,7 @@ export function CuriosityPage() {
           height: 100%;
           display: block;
           object-fit: cover;
-          object-position: center 29%;
+          object-position: center 88%;
         }
         .ca2-recognition {
           display: flex;
@@ -202,7 +255,14 @@ export function CuriosityPage() {
           font-weight: 700;
           color: var(--ca2-ink);
         }
-        .ca2-why { padding: 0 clamp(18px, 2.45vw, 74px) clamp(520px, 55vw, 1663px); }
+        .ca2-why {
+          min-height: 100svh;
+          display: flex;
+          align-items: center;
+          padding: clamp(50px, 5vw, 150px) clamp(18px, 2.45vw, 74px);
+          background: #fff;
+        }
+        .ca2-why-inner { width: 100%; }
         .ca2-why h2 {
           margin-bottom: clamp(80px, 6.7vw, 203px);
           font-size: clamp(3rem, 4.75vw, 9rem);
@@ -211,7 +271,7 @@ export function CuriosityPage() {
         .ca2-why-panels {
           display: flex;
           width: 100%;
-          height: clamp(370px, 26.8vw, 810px);
+          height: clamp(320px, min(26.8vw, 50vh), 810px);
           gap: clamp(8px, .55vw, 17px);
         }
         .ca2-why-panel {
@@ -223,6 +283,8 @@ export function CuriosityPage() {
           border: 0;
           border-radius: clamp(8px, .55vw, 17px);
           background: var(--ca2-black);
+          background-position: center;
+          background-size: cover;
           color: #fff;
           cursor: pointer;
           transition: flex-grow .5s var(--ease-standard);
@@ -262,7 +324,7 @@ export function CuriosityPage() {
           text-orientation: mixed;
         }
         .ca2-method {
-          padding: clamp(150px, 20vw, 605px) clamp(18px, 2.45vw, 74px) 0;
+          padding: clamp(130px, 9vw, 272px) clamp(18px, 2.45vw, 74px) 0;
         }
         .ca2-method h2, .ca2-founder > h2 {
           font-size: clamp(3rem, 4.75vw, 9rem);
@@ -317,7 +379,6 @@ export function CuriosityPage() {
           display: block;
           object-fit: cover;
           object-position: 62% center;
-          filter: grayscale(1);
         }
         .ca2-founder-copy {
           display: flex;
@@ -424,17 +485,16 @@ export function CuriosityPage() {
             aspect-ratio: auto;
             overflow: hidden;
           }
-          .ca2-hero-copy { top: 28%; left: 6%; width: 88%; }
+          .ca2-hero-copy { top: 50%; left: 50%; width: 88%; }
           .ca2-wordmark { margin-bottom: 28px; font-size: 1.35rem; }
           .ca2-hero h1 { font-size: clamp(3.2rem, 13vw, 5rem); }
-          .ca2-hero-bars { top: 53%; left: 13%; width: 128%; }
           .ca2-intro { padding-top: 140px; padding-bottom: 120px; }
           .ca2-intro-inner, .ca2-recognition-inner { width: min(100%, 35ch); }
           .ca2-page p { font-size: 1rem; line-height: 1.42; }
           .ca2-conveyor { height: 300px; }
-          .ca2-conveyor img { object-position: 64% center; }
+          .ca2-conveyor img { object-position: center 88%; }
           .ca2-recognition { padding-top: 120px; padding-bottom: 150px; }
-          .ca2-why { padding-bottom: 420px; }
+          .ca2-why { min-height: auto; padding-top: 150px; padding-bottom: 150px; }
           .ca2-why h2, .ca2-method h2, .ca2-founder > h2, .ca2-contact h2 { font-size: clamp(3rem, 12vw, 4.5rem); }
           .ca2-why-panels { display: grid; height: auto; }
           .ca2-why-panel, .ca2-why-panel[data-active="true"] { min-height: 260px; }
@@ -470,7 +530,22 @@ export function CuriosityPage() {
           .ca2-founder-image { height: 500px; }
         }
         @media (prefers-reduced-motion: reduce) {
+          .ca2-why { min-height: auto; }
+          .ca2-why-panels { display: grid; grid-template-columns: repeat(3, 1fr); height: auto; }
+          .ca2-why-panel, .ca2-why-panel[data-active="true"] { min-height: clamp(300px, 26vw, 560px); }
           .ca2-why-panel { transition: none; }
+          .ca2-why-panel:not([data-active="true"]) .ca2-why-panel-title {
+            font-size: clamp(1.7rem, 2.5vw, 3rem);
+            writing-mode: horizontal-tb;
+            white-space: normal;
+          }
+          .ca2-why-panel-body, .ca2-why-panel[data-active="true"] .ca2-why-panel-body {
+            display: block;
+            font-size: clamp(.9rem, 1vw, 1.1rem);
+          }
+        }
+        @media (max-width: 760px) and (prefers-reduced-motion: reduce) {
+          .ca2-why-panels { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -479,7 +554,6 @@ export function CuriosityPage() {
           <div className="ca2-wordmark">Curiosity<br />Architecture</div>
           <h1 id="ca2-hero-title">Learn<br />everything to<br />create anything</h1>
         </div>
-        <img className="ca2-hero-bars" src="/uploads/curiosity-hero-bars.png" alt="" aria-hidden="true" />
       </section>
 
       <section className="ca2-intro" aria-label="Curiosity Architecture introduction">
@@ -490,7 +564,7 @@ export function CuriosityPage() {
       </section>
 
       <figure className="ca2-conveyor">
-        <img src="/uploads/curiosity-conveyor.png" alt="Pink packages travelling through an automated production line" />
+        <img src="/uploads/curiosity-keyboard.png" alt="Hands working at a keyboard beside technical plans" />
       </figure>
 
       <section className="ca2-recognition" aria-label="The Curiosity Architecture principle">
@@ -519,7 +593,7 @@ export function CuriosityPage() {
         <h2 id="ca2-founder-title">How this started</h2>
         <div className="ca2-founder-layout">
           <div className="ca2-founder-image">
-            <img src="/uploads/curiosity-founder-stage.png" alt="Sarah Alonso Vega speaking at the AI for Good Global Summit" />
+            <img src="/uploads/curiosity-sarah.png" alt="Sarah Alonso Vega speaking at the AI for Good Global Summit" />
           </div>
           <article className="ca2-founder-copy">
             <h3>Sarah Alonso Vega</h3>

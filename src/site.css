@@ -27,15 +27,16 @@
   position: absolute;
   z-index: 1;
   top: 50%;
-  left: 8.5%;
-  width: 42%;
+  left: 50%;
+  width: min(70%, 1080px);
   transform: translateY(-50%);
+  translate: -50% 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 .home-mockup-wordmark {
-  width: clamp(150px, 18vw, 430px);
+  width: clamp(150px, 17vw, 410px);
   height: auto;
   margin-bottom: clamp(28px, 2.8vw, 82px);
 }
@@ -47,17 +48,6 @@
   font-weight: 300;
   line-height: .94;
   letter-spacing: -.04em;
-}
-.home-mockup-bars {
-  position: absolute;
-  z-index: 2;
-  top: 6.5%;
-  left: 53.4%;
-  width: 70%;
-  max-width: none;
-  height: auto;
-  pointer-events: none;
-  user-select: none;
 }
 .home-mockup-manifesto {
   padding: clamp(180px, 15.5vw, 470px) 24px clamp(210px, 18.4vw, 556px);
@@ -124,7 +114,7 @@
   transition: transform .55s var(--ease-standard);
 }
 .home-mockup-division-vexa .home-mockup-division-image img {
-  object-position: center top;
+  object-position: center;
 }
 .home-mockup-division-curiosity .home-mockup-division-image img,
 .home-mockup-division-amblia .home-mockup-division-image img {
@@ -151,7 +141,7 @@
   justify-content: center;
   padding: 0 clamp(24px, 2.25vw, 68px);
   border-radius: clamp(7px, .55vw, 17px);
-  background: #050505;
+  background: #4a1d12;
   color: #bfbfbf;
   font-family: var(--font-sans);
   font-size: clamp(.9rem, 1.08vw, 2rem);
@@ -311,81 +301,106 @@
   }
 }
 
-/* Global three-line navigation: absent at the opening frame, then fixed in
-   the upper-right once the visitor has started moving through the page. */
+/* Exact three-line control from the mockup, opening a full-viewport menu. */
 .corner-menu {
   position: fixed;
-  z-index: 100;
+  z-index: 80;
   top: clamp(16px, 2vw, 32px);
   right: clamp(16px, 2vw, 32px);
-  opacity: 0;
-  transform: translateY(-12px);
   pointer-events: none;
-  transition: opacity .25s ease, transform .25s ease;
 }
 .corner-menu-visible {
-  opacity: 1;
-  transform: translateY(0);
   pointer-events: auto;
 }
 .corner-menu-trigger {
+  position: relative;
+  z-index: 2;
   display: flex;
-  width: clamp(58px, 4.6vw, 72px);
-  height: clamp(48px, 3.8vw, 60px);
+  width: clamp(46px, 3.7vw, 62px);
+  height: clamp(46px, 3.7vw, 62px);
   margin-left: auto;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: 1px solid rgba(0,0,0,.1);
-  border-radius: 4px;
-  background: rgba(255,255,255,.94);
-  box-shadow: 0 8px 30px rgba(0,0,0,.12);
+  border: 0;
+  border-radius: 0;
+  background: #050505;
+  box-shadow: none;
   cursor: pointer;
-  backdrop-filter: blur(12px);
+}
+.corner-menu-trigger img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  transition: transform .45s cubic-bezier(.16,1,.3,1);
+}
+.corner-menu-open .corner-menu-trigger img {
+  transform: rotate(90deg);
 }
 .corner-menu-panel {
-  position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: min(310px, calc(100vw - 32px));
+  position: fixed;
+  inset: 0;
   display: flex;
+  min-height: 100dvh;
   flex-direction: column;
-  padding: 14px;
-  border: 1px solid rgba(0,0,0,.1);
-  border-radius: 6px;
-  background: rgba(255,255,255,.97);
-  box-shadow: 0 18px 55px rgba(0,0,0,.18);
+  align-items: center;
+  justify-content: center;
+  padding: clamp(28px, 5vw, 80px);
+  border: 0;
+  border-radius: 0;
+  background: #050505;
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-8px) scale(.98);
-  transform-origin: top right;
-  transition: opacity .2s ease, transform .2s ease, visibility .2s;
-  backdrop-filter: blur(16px);
+  clip-path: inset(0 0 100% 0);
+  transition: opacity .3s ease, clip-path .65s cubic-bezier(.16,1,.3,1), visibility .65s;
 }
 .corner-menu-open .corner-menu-panel {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0) scale(1);
+  clip-path: inset(0);
+}
+.corner-menu-wordmark {
+  position: absolute;
+  top: clamp(26px, 4vw, 64px);
+  left: clamp(24px, 4vw, 64px);
+  width: clamp(150px, 14vw, 260px);
+  height: auto;
+}
+.corner-menu-panel nav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(8px, 1.2vh, 20px);
 }
 .corner-menu-panel button {
-  padding: 12px 14px;
+  padding: 4px 18px;
   border: 0;
-  border-radius: 7px;
-  color: #111;
+  border-radius: 0;
+  color: #fff;
   background: transparent;
-  font-family: var(--font-label);
-  font-size: .85rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: .045em;
-  text-align: left;
-  text-transform: uppercase;
+  font-family: var(--font-serif);
+  font-size: clamp(2.7rem, 5.6vw, 7.2rem);
+  font-weight: 300;
+  line-height: .95;
+  letter-spacing: -.035em;
+  text-align: center;
   cursor: pointer;
+  transition: color .2s ease, transform .2s ease;
 }
 .corner-menu-panel button:hover,
 .corner-menu-panel button:focus-visible,
 .corner-menu-panel button.is-active {
-  background: #f0f0f0;
+  color: #e0008c;
+  background: transparent;
+  transform: translateX(8px);
+}
+.corner-menu-email {
+  position: absolute;
+  bottom: clamp(24px, 4vw, 62px);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: clamp(.9rem, 1.1vw, 1.2rem);
 }
 
 @media (max-width: 760px) {
@@ -396,7 +411,7 @@
   }
   .home-mockup-hero-copy {
     top: 28%;
-    left: 7%;
+    left: 50%;
     width: 86%;
   }
   .home-mockup-wordmark {
@@ -405,11 +420,6 @@
   }
   .home-mockup-hero h1 {
     font-size: clamp(3rem, 13vw, 5rem);
-  }
-  .home-mockup-bars {
-    top: 54%;
-    left: 17%;
-    width: 125%;
   }
   .home-mockup-manifesto {
     padding-top: 150px;
@@ -469,6 +479,25 @@
   .corner-menu-panel {
     transition: none;
   }
+}
+
+/* Section entrances remain visible by default. Browsers that support view
+   timelines add the requested soft page-by-page fade without JS gating. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    main > section:not(:first-child):not(.vx-services-sequence):not(.vx-case-sequence):not(.ca2-why),
+    main > .mockup-footer-shell,
+    .mockup-footer-shell > section,
+    .mockup-footer-shell > footer {
+      animation: cuelum-section-enter linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 28%;
+    }
+  }
+}
+@keyframes cuelum-section-enter {
+  from { opacity: .16; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Statement-hero entrance reveal (MONOLOG pattern) — a one-time fade+rise on

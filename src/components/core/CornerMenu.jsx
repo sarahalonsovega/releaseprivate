@@ -1,34 +1,46 @@
 import { useEffect, useRef, useState } from "react";
-import { ThreeBarMark } from "./ThreeBarMark.jsx";
 
 const items = ["VEXA", "Curiosity Architecture", "AMBLIA", "About", "Contact"];
 
 export function CornerMenu({ active, onNavigate }) {
-  const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const wrapRef = useRef(null);
+  const triggerRef = useRef(null);
 
   useEffect(() => {
-    const update = () => setVisible(window.scrollY > 72);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-
-  useEffect(() => {
-    const closeOutside = (event) => {
-      if (!wrapRef.current?.contains(event.target)) setOpen(false);
-    };
     const closeEscape = (event) => {
       if (event.key === "Escape") setOpen(false);
     };
-    document.addEventListener("pointerdown", closeOutside);
     document.addEventListener("keydown", closeEscape);
-    return () => {
-      document.removeEventListener("pointerdown", closeOutside);
-      document.removeEventListener("keydown", closeEscape);
-    };
+    return () => document.removeEventListener("keydown", closeEscape);
   }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    const previousFocus = document.activeElement;
+    document.body.style.overflow = "hidden";
+    const focusables = [...wrapRef.current.querySelectorAll("button, a[href]")];
+    focusables[1]?.focus();
+    const trapFocus = (event) => {
+      if (event.key !== "Tab" || focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", trapFocus);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", trapFocus);
+      previousFocus?.focus?.();
+    };
+  }, [open]);
 
   const choose = (label) => {
     setOpen(false);
@@ -36,8 +48,9 @@ export function CornerMenu({ active, onNavigate }) {
   };
 
   return (
-    <div ref={wrapRef} className={`corner-menu${visible || open ? " corner-menu-visible" : ""}${open ? " corner-menu-open" : ""}`}>
+    <div ref={wrapRef} className={`corner-menu corner-menu-visible${open ? " corner-menu-open" : ""}`}>
       <button
+        ref={triggerRef}
         className="corner-menu-trigger"
         type="button"
         aria-label={open ? "Close navigation" : "Open navigation"}
@@ -45,16 +58,20 @@ export function CornerMenu({ active, onNavigate }) {
         aria-controls="corner-menu-panel"
         onClick={() => setOpen(value => !value)}
       >
-        <ThreeBarMark color="#050505" width={37} />
+        <img src="/uploads/menu-bars-white.png" alt="" aria-hidden="true" />
       </button>
-      <nav id="corner-menu-panel" className="corner-menu-panel" aria-label="Main navigation">
-        <button type="button" onClick={() => choose("Home")}>Home</button>
-        {items.map(item => (
-          <button className={active === item ? "is-active" : ""} type="button" key={item} onClick={() => choose(item)}>
-            {item}
-          </button>
-        ))}
-      </nav>
+      <div id="corner-menu-panel" className="corner-menu-panel" role="dialog" aria-modal="true" aria-hidden={!open} aria-label="Main navigation">
+        <img className="corner-menu-wordmark" src="/assets/wordmark-white.png" alt="CUELUM" />
+        <nav aria-label="Main navigation">
+          <button type="button" onClick={() => choose("Home")}>Home</button>
+          {items.map(item => (
+            <button className={active === item ? "is-active" : ""} type="button" key={item} onClick={() => choose(item)}>
+              {item}
+            </button>
+          ))}
+        </nav>
+        <a className="corner-menu-email" href="mailto:hello@cuelum.com">hello@cuelum.com</a>
+      </div>
     </div>
   );
 }

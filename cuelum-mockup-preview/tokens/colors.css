@@ -1,0 +1,36 @@
+:root{
+/* Foundation */
+--black:#000000;
+--white:#FFFFFF;
+/* Signal (magenta family) */
+--magenta-bright:#FF00D3; /* highlights, glow cores */
+--magenta:#DB009F;        /* primary accent — the signal */
+--magenta-secondary:#8A0672; /* depth, material richness */
+--magenta-deep:#7D0359;   /* shadows, overlays, dark gradients */
+--plum:#450A46;           /* darkest tonal step before black */
+/* Neutrals (subtle layering only) */
+--grey-90:#161616;
+--grey-70:#2E2E2E;
+--grey-40:#8A8A8A;
+--grey-20:#C7C7C7;
+/* Semantic — dark world (default) */
+--bg-page:var(--black);
+--surface-card:var(--black);
+--text-primary:var(--white);
+--text-secondary:rgba(255,255,255,0.64);
+--text-meta:rgba(255,255,255,0.5);
+--accent:var(--magenta);
+--accent-hover:var(--magenta-bright);
+--rule:rgba(255,255,255,0.18);
+--rule-strong:rgba(255,255,255,0.4);
+--rule-accent:var(--magenta);
+/* Semantic — light (editorial white pages) */
+--bg-paper:var(--white);
+--text-on-paper:var(--black);
+--text-on-paper-secondary:rgba(0,0,0,0.6);
+--rule-on-paper:rgba(0,0,0,0.16);
+/* Gradient: light falling across a dark surface */
+--gradient-signal:linear-gradient(135deg,#DB009F 0%,#8A0672 38%,#7D0359 64%,#000000 100%); /* @kind color */
+--gradient-glow:radial-gradient(ellipse at center,#FF00D3 0%,#DB009F 30%,#7D0359 65%,#000000 100%); /* @kind color */
+--gradient-edge:linear-gradient(90deg,#DB009F 0%,#7D0359 45%,#000000 100%); /* @kind color */
+}

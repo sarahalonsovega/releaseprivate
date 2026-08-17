@@ -1,0 +1,41 @@
+:root{
+/* Families.
+   TT Tricks = default heading voice (substitute for The Silver Editorial).
+   Teachers  = body voice (substitute for Glacial Indifference).
+   Modius / Modius Title = punctuation voice: wordmarks, numerals, labels, impact lines ≤5 words. */
+--font-serif:"TT Tricks","The Silver Editorial",Georgia,serif;
+--font-sans:"Teachers","Glacial Indifference","Helvetica Neue",Arial,sans-serif;
+--font-title:"Modius Title","Modius",Arial,sans-serif;
+--font-label:"Modius","Teachers",sans-serif;
+/* Fixed site-wide type roles. Every page uses these four scales. */
+--display-line-height:1.02;
+--display-tracking:0em;
+--type-large-title:clamp(3.5rem,7vw,6rem);
+--type-standard-title:clamp(2rem,3.8vw,3.25rem);
+--type-body:1rem;
+--type-mini:.75rem;
+--text-display-xl:var(--type-large-title);
+--text-display-lg:var(--type-standard-title);
+--text-display-md:var(--type-standard-title);
+--text-heading-lg:var(--type-standard-title);
+--text-heading-md:var(--type-standard-title);
+--text-heading-sm:var(--type-body);
+/* Numeric display — Modius Extended 800: metrics, era numbers, methodology steps. Rules, not boxes. */
+--text-numeric-lg:var(--type-standard-title);
+--text-numeric-md:var(--type-standard-title);
+/* Body — Teachers 400/700, 12–22px */
+--text-body:var(--type-body);
+--text-body-sm:var(--type-body);
+--text-body-lg:var(--type-body);
+--body-line-height:1.55;
+/* Labels & badges — Modius 12px/0.08em, uppercase. Rare: never one above every heading. */
+--text-label:var(--type-body);
+--text-label-sm:var(--type-body);
+--label-tracking:0.08em;
+--label-tracking-wide:0.08em;
+/* Weights */
+--weight-light:300;
+--weight-regular:400;
+--weight-bold:700;
+--weight-numeric:800;
+}

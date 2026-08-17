@@ -4,20 +4,20 @@ import { CuelumHero } from "../components/core/CuelumHero.jsx";
 const divisions = [
   {
     label: "VEXA",
-    image: "/uploads/home-vexa-wood.png",
-    alt: "Sculptural curved timber architecture",
+    image: "/uploads/home-vexa-brain.png",
+    alt: "A luminous digital brain formed from magenta data structures",
     className: "home-mockup-division-vexa",
   },
   {
     label: "Curiosity Architecture",
-    image: "/uploads/home-curiosity-glass.png",
-    alt: "Interlocking translucent magenta forms",
+    image: "/uploads/home-curiosity-astronaut.png",
+    alt: "An astronaut raising a gold visor in warm evening light",
     className: "home-mockup-division-curiosity",
   },
   {
     label: "AMBLIA",
-    image: "/uploads/home-amblia-eye.png",
-    alt: "Close-up portrait framed by translucent magenta material",
+    image: "/uploads/home-amblia-eye-touch.png",
+    alt: "A person gently covering one closed eye",
     className: "home-mockup-division-amblia",
   },
 ];

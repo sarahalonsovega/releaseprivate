@@ -1,0 +1,9 @@
+:root{
+/* Motion — architectural and intentional. Reveal / Focus / Activate / Expand.
+   No bounce, no parallax, no glitch. Clarity emerging from noise. */
+--ease-reveal:cubic-bezier(0.22,1,0.36,1); /* @kind other */
+--ease-standard:cubic-bezier(0.4,0,0.2,1); /* @kind other */
+--duration-fast:200ms; /* @kind other */
+--duration-base:450ms; /* @kind other */
+--duration-slow:900ms; /* @kind other */
+}

@@ -5,7 +5,6 @@ export function CuelumHero() {
         <img className="home-mockup-wordmark" src="/assets/wordmark-white.png" alt="CUELUM" />
         <h1 id="cuelum-hero-title">We turn curiosity<br />into ventures<br />that work</h1>
       </div>
-      <img className="home-mockup-bars" src="/uploads/home-cuelum-pink-bars.png" alt="" aria-hidden="true" />
     </section>
   );
 }
