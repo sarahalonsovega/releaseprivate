@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { submitContactForm } from "../utils/submitForm.js";
+import { FormSuccess } from "../components/core/FormSuccess.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,17 +10,17 @@ const whyItems = [
   {
     title: "It compounds instead of resetting",
     body: "When one track disappears, a single-track career starts from zero. A portfolio doesn't, because each field brings methods the others can use.",
-    image: "/uploads/curiosity-why-dna.png",
+    image: "/uploads/curiosity-why-dna.webp",
   },
   {
     title: "It's the part AI doesn't take",
     body: "The value moves to framing the problem, choosing what to borrow, and judging what's worth building: the work between fields, not inside one.",
-    image: "/uploads/curiosity-why-code.png",
+    image: "/uploads/curiosity-why-code.webp",
   },
   {
     title: "It's the safer bet",
     body: "Most real advances are imports, a method from one field solving a problem in another. You can't see that from inside a single field. Three fields that talk to each other is a hedge, not a scatter.",
-    image: "/uploads/curiosity-why-chips.png",
+    image: "/uploads/curiosity-why-chips.webp",
   },
 ];
 
@@ -145,6 +146,10 @@ function ContactForm() {
     }
   };
 
+  if (status === "sent") {
+    return <FormSuccess className="ca2-form ca2-form-success" />;
+  }
+
   return (
     <form className="ca2-form" onSubmit={handleSubmit}>
       <label>
@@ -164,7 +169,7 @@ function ContactForm() {
         <input name="message" required />
       </label>
       <button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Join!"}</button>
-      <span className="ca2-form-status" role="status">{status === "sent" ? "Thank you — your message has been sent." : status === "error" ? "Please try again or email hello@cuelum.com." : ""}</span>
+      <span className="ca2-form-status" role="status">{status === "error" ? "Please try again or email hello@cuelum.com." : ""}</span>
     </form>
   );
 }
@@ -453,6 +458,10 @@ export function CuriosityPage() {
           gap: clamp(20px, 1.75vw, 53px);
           margin-top: clamp(70px, 5.3vw, 160px);
         }
+        .ca2-form-success {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
         .ca2-form label {
           display: flex;
           flex-direction: column;
@@ -577,12 +586,12 @@ export function CuriosityPage() {
       </section>
 
       <figure className="ca2-conveyor">
-        <img src="/uploads/curiosity-keyboard.png" alt="Hands working at a keyboard beside technical plans" />
+        <img src="/uploads/curiosity-keyboard.webp" alt="Hands working at a keyboard beside technical plans" loading="lazy" decoding="async" />
       </figure>
 
       <section className="ca2-recognition" aria-label="The Curiosity Architecture principle">
         <div className="ca2-recognition-inner">
-          <p>That recognition; the ability to see which fields belong in the same conversation, is what stays human.</p>
+          <p>What stays human is that recognition: the ability to see which fields belong in the same conversation.</p>
           <p>We call this Curiosity Architecture. It's not a personality type or a career hack. It's a structure: the practice of seeing what carries across domains, knowing when to bring them together, and building something that wouldn't exist if any one of them stayed alone.</p>
           <p><strong>The value isn't in knowing everything.<br />It's in knowing what matters to bring together.</strong></p>
         </div>
@@ -606,7 +615,7 @@ export function CuriosityPage() {
         <h2 id="ca2-founder-title">How this started</h2>
         <div className="ca2-founder-layout">
           <div className="ca2-founder-image">
-            <img src="/uploads/sarah-portrait-reference.png" alt="Sarah Alonso Vega speaking at the AI for Good Global Summit" />
+            <img src="/uploads/sarah-portrait-reference.webp" alt="Sarah Alonso Vega speaking at the AI for Good Global Summit" loading="lazy" decoding="async" />
           </div>
           <article className="ca2-founder-copy">
             <h3>Sarah Alonso Vega</h3>

@@ -3,6 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LogoStrip } from "../components/core/LogoStrip.jsx";
 import { submitContactForm } from "../utils/submitForm.js";
+import { FormSuccess } from "../components/core/FormSuccess.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,7 +23,7 @@ const missionCards = [
 const forces = [
   ["AI native & experienced", "Proven at global scale.\nOne mission."],
   ["AI Brain. Atelier", "Knowledge bricks, and\naccelerators."],
-  ["Curated methodology", "Tailored to how your business\nactually runs."],
+  ["Intergeneration Recombination", "Senior & Young experience\nunder one roof"],
 ];
 
 const effects = [
@@ -34,12 +35,12 @@ const effects = [
 ];
 
 const services = [
-  ["Think", "agile discovery & assessment", "/uploads/vexa-service-think.png"],
-  ["Build", "implementation of intelligent solutions", "/uploads/vexa-service-build.png"],
-  ["Operate & Support", "smart platforms", "/uploads/vexa-service-operate.png"],
-  ["Improve", "ongoing services & solutions", "/uploads/vexa-service-improve.png"],
-  ["Custom-built", "solve your specific challenges", "/uploads/vexa-service-custom.png"],
-  ["Advisory", "senior help on the calls that don't fit a service line", "/uploads/vexa-service-advisory.png"],
+  ["Think", "agile discovery & assessment", "/uploads/vexa-service-think.webp"],
+  ["Build", "implementation of intelligent solutions", "/uploads/vexa-service-build.webp"],
+  ["Operate & Support", "smart platforms", "/uploads/vexa-service-operate.webp"],
+  ["Improve", "ongoing services & solutions", "/uploads/vexa-service-improve.webp"],
+  ["Custom-built", "solve your specific challenges", "/uploads/vexa-service-custom.webp"],
+  ["Advisory", "senior help on the calls that don't fit a service line", "/uploads/vexa-service-advisory.webp"],
 ];
 
 const before = [
@@ -68,6 +69,11 @@ function ServiceSequence() {
   const stageRef = useRef(null);
   const activeRef = useRef(0);
 
+  const selectService = (index) => {
+    activeRef.current = index;
+    setActive(index);
+  };
+
   useLayoutEffect(() => {
     const mm = gsap.matchMedia();
     const context = gsap.context(() => {
@@ -82,8 +88,7 @@ function ServiceSequence() {
           onUpdate: ({ progress }) => {
             const next = Math.min(services.length - 1, Math.floor(progress * services.length));
             if (next !== activeRef.current) {
-              activeRef.current = next;
-              setActive(next);
+              selectService(next);
             }
           },
         });
@@ -97,18 +102,38 @@ function ServiceSequence() {
     };
   }, []);
 
+  const handleServiceKeyDown = (event, index) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    let next = index;
+    if (event.key === "ArrowLeft") next = (index + services.length - 1) % services.length;
+    if (event.key === "ArrowRight") next = (index + 1) % services.length;
+    if (event.key === "Home") next = 0;
+    if (event.key === "End") next = services.length - 1;
+    selectService(next);
+    stageRef.current?.querySelectorAll(".vx-service-panel")[next]?.focus();
+  };
+
   return (
     <section ref={sectionRef} className="vx-services-sequence">
       <div ref={stageRef} className="vx-services-stage">
         <h2 className="vx-serif">Services</h2>
-        <div className="vx-service-panels" role="list" aria-label="VEXA services">
+        <div className="vx-service-panels" role="group" aria-label="VEXA services">
           {services.map(([title, copy, image], index) => (
-            <article className="vx-service-panel" data-active={active === index} role="listitem" key={title}>
-              <img src={image} alt="" />
+            <button
+              className="vx-service-panel"
+              data-active={active === index}
+              type="button"
+              aria-expanded={active === index}
+              onClick={() => selectService(index)}
+              onKeyDown={(event) => handleServiceKeyDown(event, index)}
+              key={title}
+            >
+              <img src={image} alt="" loading="lazy" decoding="async" />
               <span className="vx-service-shade" aria-hidden="true" />
               <h3 className="vx-service-title vx-serif">{title}</h3>
               <p className="vx-service-copy">{copy}</p>
-            </article>
+            </button>
           ))}
         </div>
       </div>
@@ -126,6 +151,7 @@ function CustomerSequence() {
       mm.add("(min-width: 801px) and (prefers-reduced-motion: no-preference)", () => {
         const layers = gsap.utils.toArray(".vx-case-layer");
         gsap.set(layers, { autoAlpha: 0 });
+        gsap.set(layers[0], { autoAlpha: 1 });
 
         gsap.timeline({
           defaults: { ease: "none" },
@@ -139,8 +165,7 @@ function CustomerSequence() {
             invalidateOnRefresh: true,
           },
         })
-          .to(layers[0], { autoAlpha: 1, duration: 0.8 }, 0.55)
-          .to(layers[0], { autoAlpha: 0, duration: 0.45 }, "+=0.35")
+          .to(layers[0], { autoAlpha: 0, duration: 0.45 }, 1)
           .to(layers[1], { autoAlpha: 1, duration: 0.8 })
           .to(layers[1], { autoAlpha: 0, duration: 0.45 }, "+=0.35")
           .to(layers[2], { autoAlpha: 1, duration: 0.8 })
@@ -159,7 +184,6 @@ function CustomerSequence() {
       <div ref={stageRef} className="vx-case-stage">
         <h2 className="vx-serif">What customer success looks like</h2>
         <div className="vx-case-frame">
-          <div className="vx-case-empty" aria-hidden="true" />
           <article className="vx-case-layer vx-case-floor">
             <h3 className="vx-serif">Floor Coverings International<br />San Antonio</h3>
             <p>A national flooring franchise’s operations, unified into one system:<br />scheduling, CRM, and vendor management running on autonomous agents<br />built for the way the business actually works.</p>
@@ -229,7 +253,7 @@ export function VexaPage() {
 
         .vx-intro { padding:clamp(115px,10.8vw,326px) 20px clamp(132px,9.2vw,278px); }
         .vx-intro-inner { max-width:1900px; margin:auto; display:grid; gap:clamp(28px,2.2vw,66px); }
-        .vx-intro .vx-body { font-size:clamp(15px,1.15vw,35px); }
+        .vx-intro .vx-body { font-size:clamp(1rem,1.4vw,2.65rem); line-height:1.42; letter-spacing:-.018em; }
 
         .vx-evolution { padding-bottom:clamp(38px,3.6vw,110px); }
         .vx-heading { font-size:clamp(48px,5vw,151px); }
@@ -280,8 +304,9 @@ export function VexaPage() {
         .vx-services-stage { min-height:100dvh; padding:clamp(34px,4.5vh,52px) var(--vx-edge) clamp(24px,3vh,36px); display:flex; flex-direction:column; justify-content:center; background:#fff; }
         .vx-services-stage > h2 { flex:0 0 auto; margin:0 0 clamp(32px,4.8vh,58px); font-size:clamp(52px,5.2vw,157px); }
         .vx-service-panels { flex:0 1 min(67vh,1420px); width:100%; min-height:430px; display:flex; gap:clamp(6px,.55vw,17px); }
-        .vx-service-panel { position:relative; min-width:0; flex:1 1 0; overflow:hidden; border-radius:var(--vx-radius); background:#000; color:#fff; transition:flex-grow .72s cubic-bezier(.16,1,.3,1); }
+        .vx-service-panel { position:relative; min-width:0; flex:1 1 0; overflow:hidden; border:0; border-radius:var(--vx-radius); padding:0; background:#000; color:#fff; cursor:pointer; font:inherit; text-align:center; transition:flex-grow .72s cubic-bezier(.16,1,.3,1); }
         .vx-service-panel[data-active="true"] { flex-grow:5.7; }
+        .vx-service-panel:focus-visible { outline:2px solid #fff; outline-offset:-6px; }
         .vx-service-panel img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
         .vx-service-panel:nth-child(1) img { object-position:52% 52%; }
         .vx-service-panel:nth-child(2) img { object-position:48% 50%; }
@@ -298,9 +323,8 @@ export function VexaPage() {
         .vx-case-sequence { position:relative; background:#fff; }
         .vx-case-stage { min-height:100dvh; padding:clamp(72px,9vh,110px) var(--vx-edge) clamp(26px,3.5vh,42px); display:flex; flex-direction:column; justify-content:center; background:#fff; }
         .vx-case-stage > h2 { margin-bottom:clamp(28px,3.5vh,44px); font-size:clamp(43px,4.25vw,128px); }
-        .vx-case-frame { flex:0 1 min(65vh,1320px); min-height:440px; position:relative; border-radius:var(--vx-radius); overflow:hidden; background:url('/uploads/vexa-customer-floor.png') center 56%/cover no-repeat; }
-        .vx-case-empty,.vx-case-layer { position:absolute; inset:clamp(38px,3.8vw,115px); border-radius:var(--vx-radius); background:#000; color:#fff; }
-        .vx-case-empty { opacity:1; }
+        .vx-case-frame { flex:0 1 min(65vh,1320px); min-height:440px; position:relative; border-radius:var(--vx-radius); overflow:hidden; background:linear-gradient(rgba(0,0,0,.64),rgba(0,0,0,.64)),url('/uploads/vexa-customer-floor.webp') center 56%/cover no-repeat; }
+        .vx-case-layer { position:absolute; inset:0; border-radius:0; background:transparent; color:#fff; }
         .vx-case-layer { z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(26px,3vw,91px); will-change:opacity; }
         .vx-case-layer h3 { font-size:clamp(43px,4.2vw,127px); }
         .vx-case-layer p,.vx-case-layer ul { margin:clamp(28px,2.6vw,79px) 0 0; padding:0; list-style:none; font-size:clamp(13px,1.05vw,32px); line-height:1.38; }
@@ -314,6 +338,7 @@ export function VexaPage() {
         .vx-contact h2 { font-size:clamp(45px,5.1vw,154px); }
         .vx-contact-copy { margin:clamp(22px,1.9vw,57px) auto clamp(48px,4.5vw,136px); max-width:1500px; color:#92929a; }
         .vx-form { width:min(1800px,90%); margin:auto; }
+        .vx-form-success { width:min(1800px,90%); margin:auto; }
         .vx-form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(24px,4vw,121px); }
         .vx-form-row-two { display:grid; grid-template-columns:.75fr 1.5fr; gap:clamp(40px,6vw,181px); width:58%; margin:clamp(28px,2.3vw,70px) auto 0; }
         .vx-field input { width:100%; border:0; border-bottom:1px solid #aaa; border-radius:0; padding:11px 4px 16px; background:transparent; color:#171820; outline:none; text-align:center; font:clamp(13px,.9vw,27px) var(--font-sans); }
@@ -347,9 +372,9 @@ export function VexaPage() {
           .vx-service-title { top:42%; transform:translate(-50%,-50%) !important; }
           .vx-service-copy { top:58%; opacity:1 !important; visibility:visible !important; }
           .vx-case-stage { min-height:auto; padding-top:90px; padding-bottom:100px; }
-          .vx-case-frame { min-height:0; padding:22px; display:grid; gap:12px; background-position:center; }
-          .vx-case-empty { display:none; }
-          .vx-case-layer { position:relative; inset:auto; min-height:380px; opacity:1 !important; visibility:visible !important; }
+          .vx-case-frame { min-height:0; padding:0; display:grid; gap:12px; background:none; }
+          .vx-case-layer { position:relative; inset:auto; min-height:380px; border-radius:var(--vx-radius); background:linear-gradient(rgba(0,0,0,.64),rgba(0,0,0,.64)),url('/uploads/vexa-customer-floor.webp') center 56%/cover no-repeat; opacity:1 !important; visibility:visible !important; }
+          .vx-case-floor { margin:0; min-height:430px; }
           .vx-case-layer p br { display:none; }
           .vx-case-metrics strong { display:block; }
           .vx-form-grid { grid-template-columns:1fr 1fr; }
@@ -372,9 +397,9 @@ export function VexaPage() {
           .vx-service-panel { min-height:360px; flex:none !important; }
           .vx-service-title { top:42%; transform:translate(-50%,-50%) !important; }
           .vx-service-copy { top:58%; opacity:1 !important; visibility:visible !important; }
-          .vx-case-frame { min-height:0; padding:22px; display:grid; gap:12px; }
-          .vx-case-empty { display:none; }
-          .vx-case-layer { position:relative; inset:auto; min-height:420px; opacity:1 !important; visibility:visible !important; }
+          .vx-case-frame { min-height:0; padding:0; display:grid; gap:12px; background:none; }
+          .vx-case-layer { position:relative; inset:auto; min-height:420px; border-radius:var(--vx-radius); background:linear-gradient(rgba(0,0,0,.64),rgba(0,0,0,.64)),url('/uploads/vexa-customer-floor.webp') center 56%/cover no-repeat; opacity:1 !important; visibility:visible !important; }
+          .vx-case-floor { margin:0; }
         }
       `}</style>
 
@@ -401,7 +426,7 @@ export function VexaPage() {
           </div>
           <div className="vx-mission-grid">
             {missionCards.map(copy => <article className="vx-black-card vx-mission-card" key={copy}>{copy}</article>)}
-            <div className="vx-mission-image"><img src="/uploads/vexa-mission-shuttle.png" alt="Space shuttle prepared for launch" /></div>
+            <div className="vx-mission-image"><img src="/uploads/vexa-mission-shuttle.webp" alt="Space shuttle prepared for launch" loading="lazy" decoding="async" /></div>
           </div>
       </section>
 
@@ -419,7 +444,7 @@ export function VexaPage() {
         </div>
 
         <div className="vx-different">
-          <img src="/uploads/vexa-different-tools.png" alt="Mechanical components in deep shadow" />
+          <img src="/uploads/vexa-different-tools.webp" alt="Mechanical components in deep shadow" loading="lazy" decoding="async" />
           <h2 className="vx-serif">Different Eras.<br />Different Tools.<br />Same Mindset.</h2>
         </div>
         <div className="vx-forces">
@@ -430,7 +455,7 @@ export function VexaPage() {
       <section className="vx-team">
         <p className="vx-team-lead">Enter the agentic era with people who've actually built things</p>
         <h2 className="vx-serif">Thinkers. Builders. Human.</h2>
-        <p className="vx-team-note">Some of the companies we've built for:</p>
+        <p className="vx-team-note">30+ years building for:</p>
         <div className="vx-logo-window" aria-label="Companies our team has worked with">
           <div className="vx-logo-track">
             {[0, 1].map(repeat => <div className="vx-logo-group" aria-hidden={repeat === 1 || undefined} key={repeat}>{["/uploads/logos-1.png", "/uploads/logos-2.png", "/uploads/logos-3.png"].map(src => <LogoStrip src={src} height={78} key={src} />)}</div>)}
@@ -450,7 +475,7 @@ export function VexaPage() {
         <span className="vx-contact-tag">Book a call with us!</span>
         <h2 className="vx-serif">Tell us what your challenge is!</h2>
         <p className="vx-body vx-contact-copy">VEXA's THINK engagement (four to six weeks), maps where<br className="vx-desktop-break" /> your organization stands and the exact path forward.</p>
-        <form className="vx-form" onSubmit={submitThink} noValidate>
+        {status === "sent" ? <FormSuccess className="vx-form-success" /> : <form className="vx-form" onSubmit={submitThink} noValidate>
           <div className="vx-form-grid">
             {[["firstName", "First Name"], ["lastName", "Last Name"], ["company", "Company"], ["email", "Work Email"]].map(([key, label]) => <label className="vx-field" data-error={errors[key] || undefined} key={key}><input value={form[key]} onChange={field(key)} placeholder={label} aria-label={label} aria-invalid={errors[key] || undefined} /></label>)}
           </div>
@@ -459,8 +484,8 @@ export function VexaPage() {
             <label className="vx-field"><input value={form.challenge} onChange={field("challenge")} placeholder="What's your biggest challenge?" aria-label="What's your biggest challenge?" /></label>
           </div>
           <button className="vx-submit" type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Schedule"}</button>
-          <p className="vx-form-status" role="status">{status === "sent" ? "Thank you — your request has been sent." : status === "error" ? "Please try again or email hello@cuelum.com." : ""}</p>
-        </form>
+          <p className="vx-form-status" role="status">{status === "error" ? "Please try again or email hello@cuelum.com." : ""}</p>
+        </form>}
       </section>
     </main>
   );

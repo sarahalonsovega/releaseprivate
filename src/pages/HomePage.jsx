@@ -4,19 +4,19 @@ import { CuelumHero } from "../components/core/CuelumHero.jsx";
 const divisions = [
   {
     label: "VEXA",
-    image: "/uploads/home-vexa-reference.png",
+    image: "/uploads/home-vexa-reference.webp",
     alt: "A luminous digital brain formed from magenta data structures",
     className: "home-mockup-division-vexa",
   },
   {
     label: "Curiosity Architecture",
-    image: "/uploads/home-curiosity-reference.png",
+    image: "/uploads/home-curiosity-reference.webp",
     alt: "An astronaut raising a gold visor in warm evening light",
     className: "home-mockup-division-curiosity",
   },
   {
     label: "AMBLIA",
-    image: "/uploads/home-amblia-reference.png",
+    image: "/uploads/home-amblia-reference.webp",
     alt: "A person gently covering one closed eye",
     className: "home-mockup-division-amblia",
   },
@@ -26,7 +26,7 @@ function DivisionCard({ label, image, alt, className, onClick }) {
   return (
     <button className={`home-mockup-division ${className}`} type="button" onClick={onClick}>
       <span className="home-mockup-division-image">
-        <img src={image} alt={alt} />
+        <img src={image} alt={alt} loading="lazy" decoding="async" />
       </span>
       <span className="home-mockup-division-name">{label}</span>
     </button>

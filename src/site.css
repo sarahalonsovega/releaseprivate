@@ -215,6 +215,35 @@
 .contact-dialog form > button { justify-self: center; margin-top: 18px; padding: 14px 34px; border: 0; border-radius: 6px; background: #df008c; color: #fff; font: 1rem var(--font-sans); cursor: pointer; }
 .contact-dialog form > button:disabled { opacity: .55; cursor: wait; }
 .contact-dialog-status { min-height: 1.4em; margin: 0; color: #686868; font: .9rem/1.4 var(--font-sans); }
+.form-success-screen {
+  width: min(100%, 980px);
+  min-height: clamp(240px, 26vw, 480px);
+  margin-inline: auto;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(14px, 1.5vw, 24px);
+  color: #171820;
+  text-align: center;
+  outline: none;
+  animation: form-success-in .45s cubic-bezier(.16, 1, .3, 1) both;
+}
+.form-success-title {
+  font: 300 clamp(3.5rem, 6vw, 7rem)/.95 var(--font-serif);
+  letter-spacing: -.05em;
+}
+.form-success-screen p {
+  margin: 0;
+  font: clamp(1rem, 1.25vw, 1.45rem)/1.4 var(--font-sans);
+}
+.contact-dialog-success { min-height: 360px; }
+@keyframes form-success-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .form-success-screen { animation: none; }
+}
 .home-mockup-schedule:hover {
   color: #fff;
   background: #bd0078;

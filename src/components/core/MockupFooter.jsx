@@ -4,7 +4,7 @@ export function MockupFooter({ go }) {
   return (
     <div className="mockup-footer-shell">
       <section className="home-mockup-footer-image" aria-label="CUELUM architectural study">
-        <img src="/uploads/home-footer-wood.png" alt="Curved timber architecture illuminated with magenta light" />
+        <img src="/uploads/home-footer-wood.webp" alt="Curved timber architecture illuminated with magenta light" loading="lazy" decoding="async" />
       </section>
       <footer className="home-mockup-footer">
         <div className="home-mockup-footer-meta">

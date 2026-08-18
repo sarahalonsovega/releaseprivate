@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { submitContactForm } from "../utils/submitForm.js";
+import { FormSuccess } from "../components/core/FormSuccess.jsx";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -43,6 +44,10 @@ function AmbliaWaitlist() {
       setStatus("error");
     }
   };
+
+  if (status === "sent") {
+    return <FormSuccess className="am-mockup-success" />;
+  }
 
   return (
     <form className="am-mockup-form" onSubmit={submit} noValidate>
@@ -104,7 +109,7 @@ function AmbliaWaitlist() {
         )}
       </label>
       <button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Join!"}</button>
-      <span className="am-mockup-submit-status" role="status">{status === "sent" ? "You’re on the list." : status === "error" ? "Please try again or email hello@cuelum.com." : ""}</span>
+      <span className="am-mockup-submit-status" role="status">{status === "error" ? "Please try again or email hello@cuelum.com." : ""}</span>
     </form>
   );
 }
@@ -280,6 +285,9 @@ export function AmbliaPage() {
           gap: clamp(22px, 2.1vw, 64px);
           align-items: start;
         }
+        .am-mockup-success {
+          margin-top: clamp(52px, 4.5vw, 136px);
+        }
         .am-mockup-field {
           position: relative;
           display: block;
@@ -439,15 +447,17 @@ export function AmbliaPage() {
 
         <div className="am-mockup-patch">
           <img
-            src="/uploads/amblia-eye-patch.png"
+            src="/uploads/amblia-eye-patch.webp"
             alt="A child placing an eye patch over one eye"
+            loading="lazy"
+            decoding="async"
           />
         </div>
 
         <section className="am-mockup-burden" aria-labelledby="amblia-burden-title">
           <h2 id="amblia-burden-title">Treatment should<br />not<br />feel like a burden</h2>
           <div className="am-mockup-burden-copy">
-            <p>The hard part of was never the science. It's getting a child to keep wearing something they hate.</p>
+            <p>The hard part was never the science. It's getting a child to keep wearing something they hate.</p>
             <p>AMBLIA starts from the opposite place:<br />something they will not even notice they are wearing.</p>
           </div>
         </section>
