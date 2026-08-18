@@ -1,10 +1,11 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import Lenis from "lenis";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Draggable } from "gsap/Draggable";
 import { CornerMenu } from "./components/core/CornerMenu.jsx";
+import { ContactDialog } from "./components/core/ContactDialog.jsx";
 import { MockupFooter } from "./components/core/MockupFooter.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
 import { VexaPage } from "./pages/VexaPage.jsx";
@@ -50,6 +51,7 @@ function scrollToAnchor(id, lenisRef) {
 }
 
 export function App() {
+  const [contactOpen, setContactOpen] = useState(false);
   const lenisRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -110,7 +112,7 @@ export function App() {
 
   const go = (label) => {
     if (label === "Contact") {
-      window.location.href = "mailto:hello@cuelum.com";
+      setContactOpen(true);
       return;
     }
     if (label === "About") {
@@ -122,7 +124,8 @@ export function App() {
 
   return (
     <div style={{ textAlign: "center" }}>
-      <CornerMenu active={LABEL_BY_PATH[location.pathname]} onNavigate={go} />
+      <CornerMenu active={LABEL_BY_PATH[location.pathname]} isHome={isHome} onNavigate={go} />
+      <ContactDialog open={contactOpen} onClose={() => setContactOpen(false)} />
       <Routes>
         <Route path="/" element={<HomePage go={go} />} />
         <Route path="/vexa" element={<VexaPage go={go} />} />

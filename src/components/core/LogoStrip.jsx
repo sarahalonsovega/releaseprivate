@@ -15,7 +15,7 @@ export function LogoStrip({ src, height = 100 }) {
   const scale = height / 100;
   return (
     <div style={{ position: "relative", height: `${height}px`, width: `${766 * scale}px`, overflow: "hidden", flexShrink: 0 }}>
-      <img src={src} alt="" style={{ position: "absolute", top: `${-180 * scale}px`, left: `${-21 * scale}px`, height: `${460 * scale}px`, width: "auto", display: "block", filter: "invert(1)" }} />
+      <img src={src} alt="" style={{ position: "absolute", top: `${-180 * scale}px`, left: `${-21 * scale}px`, height: `${460 * scale}px`, width: "auto", display: "block" }} />
     </div>
   );
 }

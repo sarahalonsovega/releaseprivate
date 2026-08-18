@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { LogoStrip } from "../components/core/LogoStrip.jsx";
+import { submitContactForm } from "../utils/submitForm.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -62,46 +63,31 @@ const after = [
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function ServiceSequence() {
+  const [active, setActive] = useState(0);
   const sectionRef = useRef(null);
   const stageRef = useRef(null);
+  const activeRef = useRef(0);
 
   useLayoutEffect(() => {
     const mm = gsap.matchMedia();
     const context = gsap.context(() => {
       mm.add("(min-width: 801px) and (prefers-reduced-motion: no-preference)", () => {
-        const panels = gsap.utils.toArray(".vx-service-panel");
-        const titles = gsap.utils.toArray(".vx-service-title");
-        const copies = gsap.utils.toArray(".vx-service-copy");
-
-        gsap.set(panels, { flexGrow: 1 });
-        gsap.set(panels[0], { flexGrow: 5.7 });
-        gsap.set(titles, { xPercent: -50, yPercent: -50, rotation: 90 });
-        gsap.set(titles[0], { rotation: 0, yPercent: -90 });
-        gsap.set(copies, { autoAlpha: 0 });
-        gsap.set(copies[0], { autoAlpha: 1 });
-
-        const timeline = gsap.timeline({
-          defaults: { duration: 1, ease: "none" },
-          scrollTrigger: {
-            trigger: stageRef.current,
-            start: "top top",
-            end: () => `+=${window.innerHeight * 4.75}`,
-            pin: true,
-            scrub: 0.55,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
+        const trigger = ScrollTrigger.create({
+          trigger: stageRef.current,
+          start: "top top",
+          end: () => `+=${window.innerHeight * 8.2}`,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: ({ progress }) => {
+            const next = Math.min(services.length - 1, Math.floor(progress * services.length));
+            if (next !== activeRef.current) {
+              activeRef.current = next;
+              setActive(next);
+            }
           },
         });
-
-        for (let index = 0; index < panels.length - 1; index += 1) {
-          timeline
-            .to(panels[index], { flexGrow: 1 }, index)
-            .to(titles[index], { rotation: 90, yPercent: -50 }, index)
-            .to(copies[index], { autoAlpha: 0, duration: 0.25 }, index)
-            .to(panels[index + 1], { flexGrow: 5.7 }, index)
-            .to(titles[index + 1], { rotation: 0, yPercent: -90 }, index)
-            .to(copies[index + 1], { autoAlpha: 1, duration: 0.25 }, index + 0.72);
-        }
+        return () => trigger.kill();
       });
     }, sectionRef);
 
@@ -116,8 +102,8 @@ function ServiceSequence() {
       <div ref={stageRef} className="vx-services-stage">
         <h2 className="vx-serif">Services</h2>
         <div className="vx-service-panels" role="list" aria-label="VEXA services">
-          {services.map(([title, copy, image]) => (
-            <article className="vx-service-panel" role="listitem" key={title}>
+          {services.map(([title, copy, image], index) => (
+            <article className="vx-service-panel" data-active={active === index} role="listitem" key={title}>
               <img src={image} alt="" />
               <span className="vx-service-shade" aria-hidden="true" />
               <h3 className="vx-service-title vx-serif">{title}</h3>
@@ -146,18 +132,19 @@ function CustomerSequence() {
           scrollTrigger: {
             trigger: stageRef.current,
             start: "top top",
-            end: () => `+=${window.innerHeight * 3.1}`,
+            end: () => `+=${window.innerHeight * 4.4}`,
             pin: true,
             scrub: 0.5,
             anticipatePin: 1,
             invalidateOnRefresh: true,
           },
         })
-          .to(layers[0], { autoAlpha: 1, duration: 0.8 })
+          .to(layers[0], { autoAlpha: 1, duration: 0.8 }, 0.55)
           .to(layers[0], { autoAlpha: 0, duration: 0.45 }, "+=0.35")
           .to(layers[1], { autoAlpha: 1, duration: 0.8 })
           .to(layers[1], { autoAlpha: 0, duration: 0.45 }, "+=0.35")
-          .to(layers[2], { autoAlpha: 1, duration: 0.8 });
+          .to(layers[2], { autoAlpha: 1, duration: 0.8 })
+          .to(layers[2], { autoAlpha: 1, duration: 0.7 });
       });
     }, sectionRef);
 
@@ -195,9 +182,10 @@ function CustomerSequence() {
 export function VexaPage() {
   const [form, setForm] = useState({ firstName: "", lastName: "", company: "", email: "", industry: "", challenge: "" });
   const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState("idle");
   const field = key => event => setForm(current => ({ ...current, [key]: event.target.value }));
 
-  const submitThink = event => {
+  const submitThink = async event => {
     event.preventDefault();
     const next = {};
     if (!form.firstName.trim()) next.firstName = true;
@@ -208,14 +196,20 @@ export function VexaPage() {
     if (Object.keys(next).length) return;
 
     const subject = `THINK conversation request from ${form.company}`;
-    const message = [
-      `Name: ${form.firstName} ${form.lastName}`,
-      `Company: ${form.company}`,
-      `Work email: ${form.email}`,
-      form.industry && `Industry: ${form.industry}`,
-      form.challenge && `Biggest challenge: ${form.challenge}`,
-    ].filter(Boolean).join("\n");
-    window.location.href = `mailto:hello@cuelum.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+    setStatus("sending");
+    try {
+      await submitContactForm(subject, {
+        Name: `${form.firstName} ${form.lastName}`,
+        Company: form.company,
+        "Work email": form.email,
+        Industry: form.industry,
+        "Biggest challenge": form.challenge,
+      });
+      setForm({ firstName: "", lastName: "", company: "", email: "", industry: "", challenge: "" });
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -224,7 +218,7 @@ export function VexaPage() {
         .vx-page { --vx-edge:clamp(20px,2.4vw,74px); --vx-radius:8px; background:#fff; color:#171820; overflow:hidden; text-align:center; font-family:var(--font-sans); }
         .vx-page *, .vx-page *::before, .vx-page *::after { box-sizing:border-box; }
         .vx-shell { width:calc(100% - (2 * var(--vx-edge))); max-width:2880px; margin-inline:auto; }
-        .vx-serif { margin:0; font-family:var(--font-serif); font-weight:200; letter-spacing:-.04em; line-height:.98; }
+        .vx-serif { margin:0; font-family:var(--font-serif); font-weight:200; letter-spacing:-.04em; line-height:1.05; }
         .vx-body { margin:0; font-size:clamp(14px,1.06vw,32px); line-height:1.36; letter-spacing:.002em; }
         .vx-black-card { border-radius:var(--vx-radius); background:#000; color:#fff; }
 
@@ -241,12 +235,12 @@ export function VexaPage() {
         .vx-heading { font-size:clamp(48px,5vw,151px); }
         .vx-heading-note { margin:clamp(14px,1.2vw,36px) auto clamp(45px,3.6vw,110px); max-width:1500px; }
         .vx-era-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(7px,.65vw,20px); }
-        .vx-era { min-height:clamp(320px,27.2vw,822px); padding:clamp(42px,4.1vw,124px) 24px 30px; display:flex; flex-direction:column; align-items:center; color:#fff; }
-        .vx-era h3 { font-size:clamp(31px,2.9vw,88px); }
-        .vx-era-subtitle { margin:clamp(8px,.65vw,20px) 0 clamp(44px,4.2vw,127px); font-size:clamp(13px,.96vw,29px); }
-        .vx-era-list { margin:0; padding:0; list-style:none; font-size:clamp(14px,1.02vw,31px); line-height:1.55; }
+        .vx-era { min-height:clamp(340px,28.5vw,860px); padding:clamp(38px,3.5vw,106px) 24px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#fff; }
+        .vx-era h3 { font-size:clamp(34px,3.15vw,95px); }
+        .vx-era-subtitle { margin:clamp(10px,.8vw,24px) 0 clamp(40px,3.25vw,98px); font-size:clamp(14px,1.04vw,31px); }
+        .vx-era-list { margin:0; padding:0; list-style:none; font-size:clamp(15px,1.12vw,34px); line-height:1.62; }
 
-        .vx-mission { padding:clamp(100px,7.2vw,218px) 0 0; }
+        .vx-mission { padding:0 0 clamp(120px,9vw,272px); }
         .vx-mission h2 { font-size:clamp(49px,5vw,151px); }
         .vx-mission-copy { max-width:1700px; margin:clamp(36px,2.9vw,88px) auto clamp(55px,4.3vw,130px); display:grid; gap:clamp(28px,2.1vw,64px); }
         .vx-mission-copy p { font-size:clamp(14px,1.08vw,33px); line-height:1.34; }
@@ -257,12 +251,12 @@ export function VexaPage() {
         .vx-mission-card:nth-child(3) { grid-column:2; grid-row:2; }
         .vx-mission-card:nth-child(4) { grid-column:1; grid-row:2; }
         .vx-mission-image { grid-column:3 / 5; grid-row:1 / 3; border-radius:var(--vx-radius); overflow:hidden; }
-        .vx-mission-image img { width:100%; height:100%; object-fit:cover; object-position:50% 54%; display:block; }
+        .vx-mission-image img { width:100%; height:100%; object-fit:cover; object-position:50% 18%; display:block; }
 
-        .vx-different { margin-top:clamp(9px,.65vw,20px); height:clamp(370px,34.3vw,1037px); display:grid; place-items:center; position:relative; overflow:hidden; border-radius:var(--vx-radius); color:#fff; }
-        .vx-different::after { content:""; position:absolute; inset:0; background:rgba(0,0,0,.47); }
+        .vx-different { margin-top:clamp(7px,.55vw,17px); height:clamp(370px,34.3vw,1037px); display:grid; place-items:center; position:relative; overflow:hidden; border-radius:var(--vx-radius); color:#fff; }
+        .vx-different::after { content:""; position:absolute; inset:0; background:rgba(0,0,0,.6); }
         .vx-different img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
-        .vx-different h2 { position:relative; z-index:1; font-size:clamp(51px,5.5vw,166px); line-height:1.05; }
+        .vx-different h2 { position:relative; z-index:1; font-size:clamp(51px,5.5vw,166px); line-height:1.08; transform:none; }
         .vx-forces { display:grid; grid-template-columns:repeat(3,1fr); gap:30px; padding:clamp(22px,1.7vw,52px) clamp(20px,3vw,90px) 0; }
         .vx-force h3 { font-size:clamp(29px,2.7vw,82px); }
         .vx-force p { margin:clamp(13px,1vw,30px) auto 0; font-size:clamp(12px,.9vw,27px); line-height:1.2; }
@@ -286,7 +280,8 @@ export function VexaPage() {
         .vx-services-stage { min-height:100dvh; padding:clamp(34px,4.5vh,52px) var(--vx-edge) clamp(24px,3vh,36px); display:flex; flex-direction:column; justify-content:center; background:#fff; }
         .vx-services-stage > h2 { flex:0 0 auto; margin:0 0 clamp(32px,4.8vh,58px); font-size:clamp(52px,5.2vw,157px); }
         .vx-service-panels { flex:0 1 min(67vh,1420px); width:100%; min-height:430px; display:flex; gap:clamp(6px,.55vw,17px); }
-        .vx-service-panel { position:relative; min-width:0; flex:1 1 0; overflow:hidden; border-radius:var(--vx-radius); background:#000; color:#fff; }
+        .vx-service-panel { position:relative; min-width:0; flex:1 1 0; overflow:hidden; border-radius:var(--vx-radius); background:#000; color:#fff; transition:flex-grow .72s cubic-bezier(.16,1,.3,1); }
+        .vx-service-panel[data-active="true"] { flex-grow:5.7; }
         .vx-service-panel img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
         .vx-service-panel:nth-child(1) img { object-position:52% 52%; }
         .vx-service-panel:nth-child(2) img { object-position:48% 50%; }
@@ -294,20 +289,22 @@ export function VexaPage() {
         .vx-service-panel:nth-child(4) img { object-position:50% 50%; }
         .vx-service-panel:nth-child(5) img { object-position:54% 50%; }
         .vx-service-panel:nth-child(6) img { object-position:49% 50%; }
-        .vx-service-shade { position:absolute; inset:0; background:rgba(0,0,0,.58); }
-        .vx-service-title { position:absolute; z-index:1; left:50%; top:50%; margin:0; white-space:nowrap; font-size:clamp(28px,2.9vw,88px); will-change:transform; }
-        .vx-service-copy { position:absolute; z-index:1; left:24px; right:24px; top:57%; margin:0; font-size:clamp(14px,1.15vw,35px); line-height:1.3; will-change:opacity; }
+        .vx-service-shade { position:absolute; inset:0; background:rgba(0,0,0,.7); }
+        .vx-service-title { position:absolute; z-index:1; left:50%; top:50%; margin:0; white-space:nowrap; font-size:clamp(28px,2.9vw,88px); transform:translate(-50%,-50%) rotate(90deg); transition:transform .72s cubic-bezier(.16,1,.3,1); }
+        .vx-service-panel[data-active="true"] .vx-service-title { transform:translate(-50%,-90%) rotate(0); }
+        .vx-service-copy { position:absolute; z-index:1; left:24px; right:24px; top:57%; margin:0; opacity:0; visibility:hidden; font-size:clamp(14px,1.15vw,35px); line-height:1.3; transition:opacity .3s ease; }
+        .vx-service-panel[data-active="true"] .vx-service-copy { opacity:1; visibility:visible; transition-delay:.34s; }
 
         .vx-case-sequence { position:relative; background:#fff; }
-        .vx-case-stage { min-height:100dvh; padding:clamp(30px,4vh,48px) var(--vx-edge); display:flex; flex-direction:column; justify-content:center; background:#fff; }
-        .vx-case-stage > h2 { margin-bottom:clamp(34px,4.5vh,54px); font-size:clamp(47px,5vw,151px); }
-        .vx-case-frame { flex:0 1 min(71vh,1500px); min-height:470px; position:relative; border-radius:var(--vx-radius); overflow:hidden; background:url('/uploads/vexa-customer-floor.png') center 56%/cover no-repeat; }
-        .vx-case-empty,.vx-case-layer { position:absolute; inset:clamp(28px,2.7vw,82px); border-radius:var(--vx-radius); background:#000; color:#fff; }
+        .vx-case-stage { min-height:100dvh; padding:clamp(72px,9vh,110px) var(--vx-edge) clamp(26px,3.5vh,42px); display:flex; flex-direction:column; justify-content:center; background:#fff; }
+        .vx-case-stage > h2 { margin-bottom:clamp(28px,3.5vh,44px); font-size:clamp(43px,4.25vw,128px); }
+        .vx-case-frame { flex:0 1 min(65vh,1320px); min-height:440px; position:relative; border-radius:var(--vx-radius); overflow:hidden; background:url('/uploads/vexa-customer-floor.png') center 56%/cover no-repeat; }
+        .vx-case-empty,.vx-case-layer { position:absolute; inset:clamp(38px,3.8vw,115px); border-radius:var(--vx-radius); background:#000; color:#fff; }
         .vx-case-empty { opacity:1; }
         .vx-case-layer { z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(26px,3vw,91px); will-change:opacity; }
-        .vx-case-layer h3 { font-size:clamp(47px,5vw,151px); }
+        .vx-case-layer h3 { font-size:clamp(43px,4.2vw,127px); }
         .vx-case-layer p,.vx-case-layer ul { margin:clamp(28px,2.6vw,79px) 0 0; padding:0; list-style:none; font-size:clamp(13px,1.05vw,32px); line-height:1.38; }
-        .vx-case-floor h3 { font-size:clamp(45px,4.7vw,142px); }
+        .vx-case-floor h3 { font-size:clamp(42px,4vw,121px); }
         .vx-case-metrics { margin-top:clamp(21px,1.8vw,54px) !important; line-height:1.8 !important; }
         .vx-case-metrics strong { display:inline-block; margin:0 clamp(8px,.75vw,23px); letter-spacing:.08em; }
         .vx-case-after ul { margin-top:clamp(18px,1.6vw,48px); }
@@ -325,6 +322,7 @@ export function VexaPage() {
         .vx-submit { margin-top:clamp(43px,3.8vw,115px); border:0; border-radius:6px; padding:clamp(13px,1vw,30px) clamp(27px,2vw,60px); background:#df0072; color:#fff; cursor:pointer; font:clamp(14px,.9vw,27px) var(--font-sans); transition:transform .16s ease,background .16s ease; }
         .vx-submit:hover { background:#bd0061; }
         .vx-submit:active { transform:scale(.97); }
+        .vx-form-status { min-height:1.5em; margin:16px 0 0; color:#777780; font-size:clamp(12px,.82vw,24px); }
 
         @media (max-width:800px) {
           .vx-hero { height:560px; }
@@ -332,11 +330,12 @@ export function VexaPage() {
           .vx-desktop-break { display:none; }
           .vx-era-grid { grid-template-columns:1fr; }
           .vx-era { min-height:300px; }
-          .vx-mission { padding-top:105px; }
+          .vx-mission { padding:0 0 110px; }
           .vx-mission-grid { grid-template-columns:1fr; grid-template-rows:none; }
           .vx-mission-card,.vx-mission-card:nth-child(n),.vx-mission-image { grid-column:auto; grid-row:auto; min-height:210px; }
           .vx-mission-image { height:440px; }
           .vx-different { height:500px; }
+          .vx-different h2 { transform:none; }
           .vx-forces { grid-template-columns:1fr; gap:48px; padding-top:46px; }
           .vx-team { padding:130px 0 145px; }
           .vx-logo-track { animation-duration:25s; }
@@ -394,6 +393,18 @@ export function VexaPage() {
         </div>
       </section>
 
+      <section className="vx-shell vx-mission">
+          <h2 className="vx-serif">Our Mission</h2>
+          <div className="vx-mission-copy">
+            <p className="vx-body">Most of what your company needs to solve has already been solved<br className="vx-desktop-break" /> somewhere inside it. The knowledge just lives in people's heads and<br className="vx-desktop-break" /> scattered spreadsheets instead of a system anyone can reuse.</p>
+            <p className="vx-body">We turn your company's knowledge into intelligence you can reuse,<br className="vx-desktop-break" /> scale, and own.</p>
+          </div>
+          <div className="vx-mission-grid">
+            {missionCards.map(copy => <article className="vx-black-card vx-mission-card" key={copy}>{copy}</article>)}
+            <div className="vx-mission-image"><img src="/uploads/vexa-mission-shuttle.png" alt="Space shuttle prepared for launch" /></div>
+          </div>
+      </section>
+
       <section className="vx-shell vx-evolution">
         <h2 className="vx-serif vx-heading">The evolution of work</h2>
         <p className="vx-body vx-heading-note">The strongest players don’t move from one era to the next. They learn to<br className="vx-desktop-break" /> leverage all three simultaneously.</p>
@@ -405,18 +416,6 @@ export function VexaPage() {
               <ul className="vx-era-list">{era.items.map(item => <li key={item}>{item}</li>)}</ul>
             </article>
           ))}
-        </div>
-
-        <div className="vx-mission">
-          <h2 className="vx-serif">Our Mission</h2>
-          <div className="vx-mission-copy">
-            <p className="vx-body">Most of what your company needs to solve has already been solved<br className="vx-desktop-break" /> somewhere inside it. The knowledge just lives in people's heads and<br className="vx-desktop-break" /> scattered spreadsheets instead of a system anyone can reuse.</p>
-            <p className="vx-body">We turn your company's knowledge into intelligence you can reuse,<br className="vx-desktop-break" /> scale, and own.</p>
-          </div>
-          <div className="vx-mission-grid">
-            {missionCards.map(copy => <article className="vx-black-card vx-mission-card" key={copy}>{copy}</article>)}
-            <div className="vx-mission-image"><img src="/uploads/vexa-mission-shuttle.png" alt="Space shuttle prepared for launch" /></div>
-          </div>
         </div>
 
         <div className="vx-different">
@@ -459,7 +458,8 @@ export function VexaPage() {
             <label className="vx-field"><input value={form.industry} onChange={field("industry")} placeholder="Industry" aria-label="Industry" /></label>
             <label className="vx-field"><input value={form.challenge} onChange={field("challenge")} placeholder="What's your biggest challenge?" aria-label="What's your biggest challenge?" /></label>
           </div>
-          <button className="vx-submit" type="submit">Schedule</button>
+          <button className="vx-submit" type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Schedule"}</button>
+          <p className="vx-form-status" role="status">{status === "sent" ? "Thank you — your request has been sent." : status === "error" ? "Please try again or email hello@cuelum.com." : ""}</p>
         </form>
       </section>
     </main>

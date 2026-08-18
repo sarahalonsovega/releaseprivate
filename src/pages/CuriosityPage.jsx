@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { submitContactForm } from "../utils/submitForm.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -63,7 +64,7 @@ function WhyArchitectureWorks() {
           id: "curiosity-why-pin",
           trigger: section,
           start: "top top",
-          end: () => `+=${window.innerHeight * 2.65}`,
+          end: () => `+=${window.innerHeight * 4.15}`,
           pin: true,
           pinSpacing: true,
           anticipatePin: 1,
@@ -109,7 +110,7 @@ function WhyArchitectureWorks() {
               aria-expanded={isActive}
               onClick={() => selectPanel(index)}
               onKeyDown={(event) => handleKeyDown(event, index)}
-              style={{ backgroundImage: `linear-gradient(rgba(0,0,0,${isActive ? ".48" : ".58"}), rgba(0,0,0,${isActive ? ".48" : ".58"})), url("${item.image}")` }}
+              style={{ backgroundImage: `linear-gradient(rgba(0,0,0,${isActive ? ".64" : ".72"}), rgba(0,0,0,${isActive ? ".64" : ".72"})), url("${item.image}")` }}
             >
               <span className="ca2-why-panel-inner">
                 <span className="ca2-why-panel-title">{item.title}</span>
@@ -125,14 +126,23 @@ function WhyArchitectureWorks() {
 }
 
 function ContactForm() {
-  const handleSubmit = (event) => {
+  const [status, setStatus] = useState("idle");
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const subject = encodeURIComponent("Curiosity Architecture enquiry");
-    const body = encodeURIComponent(
-      `Name: ${data.get("firstName")} ${data.get("lastName")}\nEmail: ${data.get("email")}\n\n${data.get("message")}`,
-    );
-    window.location.href = `mailto:hello@cuelum.com?subject=${subject}&body=${body}`;
+    setStatus("sending");
+    try {
+      await submitContactForm("Curiosity Architecture enquiry", {
+        "First name": data.get("firstName"),
+        "Last name": data.get("lastName"),
+        Email: data.get("email"),
+        Message: data.get("message"),
+      });
+      event.currentTarget.reset();
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -153,7 +163,8 @@ function ContactForm() {
         <span>Your Message</span>
         <input name="message" required />
       </label>
-      <button type="submit">Join!</button>
+      <button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Join!"}</button>
+      <span className="ca2-form-status" role="status">{status === "sent" ? "Thank you — your message has been sent." : status === "error" ? "Please try again or email hello@cuelum.com." : ""}</span>
     </form>
   );
 }
@@ -208,18 +219,18 @@ export function CuriosityPage() {
           color: #fff;
         }
         .ca2-wordmark {
-          margin-bottom: clamp(28px, 2.7vw, 82px);
+          margin-bottom: clamp(44px, 4vw, 121px);
           font-family: var(--font-title);
           font-size: clamp(1.35rem, 2.1vw, 4rem);
           font-weight: 700;
-          line-height: .82;
+          line-height: 1.12;
           letter-spacing: .035em;
           text-transform: uppercase;
         }
         .ca2-hero h1 {
           color: #fff;
           font-size: clamp(3rem, 4.8vw, 9.1rem);
-          line-height: .9;
+          line-height: 1.05;
         }
         .ca2-intro {
           display: flex;
@@ -266,7 +277,7 @@ export function CuriosityPage() {
         .ca2-why h2 {
           margin-bottom: clamp(80px, 6.7vw, 203px);
           font-size: clamp(3rem, 4.75vw, 9rem);
-          line-height: .93;
+          line-height: 1.06;
         }
         .ca2-why-panels {
           display: flex;
@@ -319,7 +330,7 @@ export function CuriosityPage() {
         .ca2-why-panel[data-active="true"] .ca2-why-panel-body { display: block; }
         .ca2-why-panel:not([data-active="true"]) .ca2-why-panel-inner { padding: 16px; }
         .ca2-why-panel:not([data-active="true"]) .ca2-why-panel-title {
-          font-size: clamp(1.45rem, 2.2vw, 4.15rem);
+          font-size: clamp(1.2rem, 1.8vw, 3.4rem);
           writing-mode: vertical-rl;
           text-orientation: mixed;
         }
@@ -328,7 +339,7 @@ export function CuriosityPage() {
         }
         .ca2-method h2, .ca2-founder > h2 {
           font-size: clamp(3rem, 4.75vw, 9rem);
-          line-height: .95;
+          line-height: 1.06;
         }
         .ca2-method-grid {
           display: grid;
@@ -350,7 +361,7 @@ export function CuriosityPage() {
         .ca2-method-card h3 {
           max-width: 13ch;
           font-size: clamp(2rem, 3.05vw, 5.75rem);
-          line-height: .92;
+          line-height: 1.06;
         }
         .ca2-method-card p {
           max-width: 28ch;
@@ -378,7 +389,8 @@ export function CuriosityPage() {
           height: 100%;
           display: block;
           object-fit: cover;
-          object-position: 62% center;
+          object-position: 47% center;
+          transform: none;
         }
         .ca2-founder-copy {
           display: flex;
@@ -393,7 +405,7 @@ export function CuriosityPage() {
         .ca2-founder-copy h3 {
           margin-bottom: clamp(54px, 4vw, 121px);
           font-size: clamp(3rem, 4.75vw, 9rem);
-          line-height: .95;
+          line-height: 1.06;
           text-align: center;
         }
         .ca2-founder-copy p {
@@ -426,7 +438,7 @@ export function CuriosityPage() {
           margin: clamp(38px, 3.25vw, 98px) 0 clamp(32px, 2.5vw, 76px);
           color: #111;
           font-size: clamp(3rem, 4.75vw, 9rem);
-          line-height: .9;
+          line-height: 1.06;
         }
         .ca2-contact > p {
           max-width: 61ch;
@@ -479,6 +491,7 @@ export function CuriosityPage() {
         }
         .ca2-form button:hover { background: #bb0073; }
         .ca2-form button:active { transform: translateY(1px); }
+        .ca2-form-status { grid-column:1 / -1; min-height:1.5em; color:#6d6d74; font:clamp(.8rem,.9vw,1.7rem)/1.4 var(--font-sans); }
         @media (max-width: 760px) {
           .ca2-hero {
             min-height: 720px;
@@ -593,7 +606,7 @@ export function CuriosityPage() {
         <h2 id="ca2-founder-title">How this started</h2>
         <div className="ca2-founder-layout">
           <div className="ca2-founder-image">
-            <img src="/uploads/curiosity-sarah.png" alt="Sarah Alonso Vega speaking at the AI for Good Global Summit" />
+            <img src="/uploads/sarah-portrait-reference.png" alt="Sarah Alonso Vega speaking at the AI for Good Global Summit" />
           </div>
           <article className="ca2-founder-copy">
             <h3>Sarah Alonso Vega</h3>

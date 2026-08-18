@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { submitContactForm } from "../utils/submitForm.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function AmbliaWaitlist() {
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "" });
   const [errors, setErrors] = useState({});
+  const [status, setStatus] = useState("idle");
 
   const updateField = event => {
     const { name, value } = event.target;
@@ -14,7 +16,7 @@ function AmbliaWaitlist() {
     }
   };
 
-  const submit = event => {
+  const submit = async event => {
     event.preventDefault();
     const nextErrors = {};
     if (!form.firstName.trim()) nextErrors.firstName = "Please enter your first name.";
@@ -28,15 +30,18 @@ function AmbliaWaitlist() {
 
     setErrors({});
     const fullName = `${form.firstName.trim()} ${form.lastName.trim()}`;
-    const subject = encodeURIComponent(`AMBLIA waitlist - ${fullName}`);
-    const body = encodeURIComponent([
-      "AMBLIA waitlist request",
-      "",
-      `First name: ${form.firstName.trim()}`,
-      `Last name: ${form.lastName.trim()}`,
-      `Email: ${form.email.trim()}`,
-    ].join("\n"));
-    window.location.href = `mailto:hello@cuelum.com?subject=${subject}&body=${body}`;
+    setStatus("sending");
+    try {
+      await submitContactForm(`AMBLIA waitlist - ${fullName}`, {
+        "First name": form.firstName,
+        "Last name": form.lastName,
+        Email: form.email,
+      });
+      setForm({ firstName: "", lastName: "", email: "" });
+      setStatus("sent");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -98,7 +103,8 @@ function AmbliaWaitlist() {
           </span>
         )}
       </label>
-      <button type="submit">Join!</button>
+      <button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Join!"}</button>
+      <span className="am-mockup-submit-status" role="status">{status === "sent" ? "You’re on the list." : status === "error" ? "Please try again or email hello@cuelum.com." : ""}</span>
     </form>
   );
 }
@@ -154,7 +160,7 @@ export function AmbliaPage() {
           font-family: var(--font-serif);
           font-size: clamp(3.1rem, 4.45vw, 8.4rem);
           font-weight: 300;
-          line-height: .92;
+          line-height: 1.06;
           letter-spacing: -.04em;
           text-wrap: balance;
         }
@@ -215,7 +221,7 @@ export function AmbliaPage() {
           font-family: var(--font-serif);
           font-size: clamp(2.8rem, 4.45vw, 8.4rem);
           font-weight: 300;
-          line-height: .88;
+          line-height: 1.08;
           letter-spacing: -.04em;
           text-align: center;
           text-wrap: balance;
@@ -224,8 +230,11 @@ export function AmbliaPage() {
           display: flex;
           flex-direction: column;
           gap: clamp(38px, 3vw, 90px);
+          text-align: center;
         }
         .am-mockup-burden p {
+          max-width: 42ch;
+          margin-inline: auto;
           color: #fff;
           font-size: clamp(.95rem, 1.15vw, 2.18rem);
           line-height: 1.35;
@@ -252,7 +261,7 @@ export function AmbliaPage() {
           font-family: var(--font-serif);
           font-size: clamp(2.75rem, 4.45vw, 8.4rem);
           font-weight: 300;
-          line-height: .95;
+          line-height: 1.06;
           letter-spacing: -.04em;
           text-wrap: balance;
         }
@@ -327,6 +336,7 @@ export function AmbliaPage() {
         .am-mockup-form button:active {
           transform: translateY(1px);
         }
+        .am-mockup-submit-status { grid-column:1 / -1; min-height:1.5em; color:#66676e; font-size:clamp(.8rem,.9vw,1.7rem); }
         @media (max-width: 760px) {
           .am-mockup-hero {
             min-height: 660px;
@@ -435,7 +445,7 @@ export function AmbliaPage() {
         </div>
 
         <section className="am-mockup-burden" aria-labelledby="amblia-burden-title">
-          <h2 id="amblia-burden-title">Treatment should not<br />feel like a burden</h2>
+          <h2 id="amblia-burden-title">Treatment should<br />not<br />feel like a burden</h2>
           <div className="am-mockup-burden-copy">
             <p>The hard part of was never the science. It's getting a child to keep wearing something they hate.</p>
             <p>AMBLIA starts from the opposite place:<br />something they will not even notice they are wearing.</p>

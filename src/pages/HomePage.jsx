@@ -4,19 +4,19 @@ import { CuelumHero } from "../components/core/CuelumHero.jsx";
 const divisions = [
   {
     label: "VEXA",
-    image: "/uploads/home-vexa-brain.png",
+    image: "/uploads/home-vexa-reference.png",
     alt: "A luminous digital brain formed from magenta data structures",
     className: "home-mockup-division-vexa",
   },
   {
     label: "Curiosity Architecture",
-    image: "/uploads/home-curiosity-astronaut.png",
+    image: "/uploads/home-curiosity-reference.png",
     alt: "An astronaut raising a gold visor in warm evening light",
     className: "home-mockup-division-curiosity",
   },
   {
     label: "AMBLIA",
-    image: "/uploads/home-amblia-eye-touch.png",
+    image: "/uploads/home-amblia-reference.png",
     alt: "A person gently covering one closed eye",
     className: "home-mockup-division-amblia",
   },
@@ -58,7 +58,7 @@ export function HomePage({ go }) {
         <span className="home-mockup-contact-tag">Book a call with us!</span>
         <h2 id="home-contact-title">Tell us what you’re<br />curious about</h2>
         <p>Open to chat about story, research collaborations,<br className="home-mockup-desktop-break" /> consulting, and partnerships, or conversations that don&apos;t fit<br className="home-mockup-desktop-break" /> any of those.</p>
-        <a className="home-mockup-schedule" href="mailto:hello@cuelum.com?subject=Let%27s%20schedule%20a%20conversation">Schedule</a>
+        <button className="home-mockup-schedule" type="button" onClick={() => go("Contact")}>Schedule</button>
       </section>
 
       <MockupFooter go={go} />

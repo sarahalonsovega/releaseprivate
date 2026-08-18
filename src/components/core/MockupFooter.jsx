@@ -19,7 +19,7 @@ export function MockupFooter({ go }) {
             <a href="https://www.linkedin.com/company/cuelum/" target="_blank" rel="noreferrer">LinkedIn</a>
           </div>
           <div>
-            <a href="mailto:hello@cuelum.com">Contact</a>
+            <button type="button" onClick={() => go("Contact")}>Contact</button>
             <Link to="/privacy">Privacy policy</Link>
             <Link to="/terms-of-use">Terms of service</Link>
           </div>
